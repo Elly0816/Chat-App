@@ -44,10 +44,12 @@ io.on('connection', (socket) => {
     console.log(`user ${socket.id} connected to the server`);
 
     socket.on("disconnect", () => {
-        console.log(`user ${socket.id} disconnected from the server`)
-    })
-})
+        console.log(`user ${socket.id} disconnected from the server`);
+    });
+
+    socket.on('send', (arg) => { console.log(arg); });
+});
 
 server.listen(port, () => {
-    console.log(`Server up and running at ${port}`)
-})
+    console.log(`Server up and running at ${port}`);
+});
