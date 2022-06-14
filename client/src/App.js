@@ -10,18 +10,22 @@ const socket = io.connect("http://localhost:5000");
 
 function App() {
 
-  const [ mesages, setMessages ] = useState([]);
+  const [ messages, setMessages ] = useState([]);
 
 
   function sendMessage(message){
     socket.emit('send', message);
   }
 
-  
+  socket.on('send', (arg) => {
+    setMessages([...messages, arg])
+  })
+
   return (
     <div className='App'>
       <Header/>
-      <Messages/>
+      {messages.map((message, index) => 
+         <Messages key={message+index} message={message}/>)}
       <Entry sendMessage={sendMessage}/>
     </div>
   );

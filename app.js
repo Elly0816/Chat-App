@@ -47,7 +47,10 @@ io.on('connection', (socket) => {
         console.log(`user ${socket.id} disconnected from the server`);
     });
 
-    socket.on('send', (arg) => { console.log(arg); });
+    socket.on('send', (arg) => {
+        console.log(arg);
+        socket.emit('send', arg);
+    });
 });
 
 server.listen(port, () => {
