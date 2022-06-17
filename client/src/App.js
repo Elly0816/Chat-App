@@ -5,6 +5,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import Messages from './components/Messages';
 import  io from 'socket.io-client';
 import Entry from './components/Entry';
+import Login from './components/Login';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 const socket = io.connect("http://localhost:5000");
 
@@ -35,11 +37,15 @@ function App() {
   return (
     <div className='app'>
       <Header/>
-      <div className='message-container' ref={ messageContainer }>
+      <Router>
+        <Routes>
+          <Route path="/" element={ <Login/> } />
+          <Route path="/home" element={ <div> <div className='message-container' ref={ messageContainer }>
         {messages.map((message, index) => 
           <Messages key={message+index} message={message}/>)}
-      </div>
-      <Entry sendMessage={sendMessage}/>
+      </div> <Entry sendMessage={sendMessage}/> </div>}/>
+        </Routes>
+      </Router>
     </div>
   );
 }
