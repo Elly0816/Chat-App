@@ -10,21 +10,29 @@ h6 {
 
 .app {
     margin: 2em auto;
-    width: 50%;
+    max-width: 50em;
 }
 
 .header {
-    background-color: blue;
+    background-color: navy;
     padding: 0.5em;
     color: white;
 }
 
 .message-container {
     margin: 0;
-    height: 10em;
+    height: 30em;
     background-color: gray;
     padding: 0.25em 0.5em;
     overflow-y: scroll;
+}
+
+.message {
+    display: block;
+}
+
+.message .button {
+    float: right;
 }
 
 .messages {

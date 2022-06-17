@@ -25,7 +25,7 @@ export default function Entry(props){
         <Form.Group className="mb-12" controlId="exampleForm.ControlTextarea1">
             <Form.Control autoComplete='off' value={message} onChange={handleChange} rows={3} placeholder="Message"/>
     </Form.Group>
-    <Button variant='success' type='submit' >Send</Button>
+    <Button className='button' variant='success' type='submit' >Send</Button>
     </Form>
     </div>
 }

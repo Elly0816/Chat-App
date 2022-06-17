@@ -8,6 +8,8 @@ const http = require('http');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
 
+
+/*Creates the websocket */
 const io = new Server(server, {
     cors: {
         origin: 'http://localhost:3000',
@@ -15,29 +17,41 @@ const io = new Server(server, {
     }
 });
 
-mongoose.connect('mongodb://localhost:27017/chat');
+mongoose.connect('mongodb://localhost:27017/chatDB');
 
 const port = 5000;
 
-/*Build the messages schema and database*/
+/*Message Schema*/
 
-const msgSchema = new mongoose.Schema({
-    from: String,
-    message: String,
-    to: String,
-    date: {
-        type: Date,
-        default: Date.now()
-    }
+const messageSchema = new mongoose.Schema({
+    text: String,
+    time: { type: Date, default: Date.now }
 });
 
+/*Schema for chats*/
+const chatSchema = new mongoose.Schema({
+    with: String,
+    messages: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Message'
+    }]
+});
+
+/*User Schema */
 const userSchema = new mongoose.Schema({
     firstName: String,
     lastName: String,
     email: String,
-    password: String
-})
+    password: String,
+    connections: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    chats: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chat' }],
+    requests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+});
 
+/*Create the models*/
+const User = mongoose.model('User', userSchema);
+const Message = mongoose.model('Message', messageSchema);
+const Chat = mongoose.model('Chat', chatSchema);
 
 
 io.on('connection', (socket) => {
