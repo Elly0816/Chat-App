@@ -41,9 +41,9 @@ function App() {
         <Routes>
           <Route path="/" element={ <Login/> } />
           <Route path="/home" element={ <div> <div className='message-container' ref={ messageContainer }>
-        {messages.map((message, index) => 
-          <Messages key={message+index} message={message}/>)}
-      </div> <Entry sendMessage={sendMessage}/> </div>}/>
+            {messages.map((message, index) => 
+              <Messages key={message+index} message={message}/>)}
+          </div> <Entry sendMessage={sendMessage}/> </div>}/>
         </Routes>
       </Router>
     </div>

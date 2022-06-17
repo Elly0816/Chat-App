@@ -24,6 +24,10 @@ h6 {
     background-color: blanchedalmond;
 }
 
+.form-action {
+    margin: auto 45%;
+}
+
 .message-container {
     margin: 0;
     height: 30em;
