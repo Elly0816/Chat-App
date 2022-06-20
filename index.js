@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 const mongoose = require('mongoose');
 const http = require('http');
 
@@ -74,6 +76,22 @@ io.on('connection', (socket) => {
         socket.emit('send', arg);
     });
 });
+
+
+app.post('/register', (req, res) => {
+    const data = req.body;
+    console.log(data);
+    res.send(data);
+});
+
+app.post('/login', (req, res) => {
+    const data = req.body;
+    console.log(data);
+    res.send(data);
+});
+
+
+
 
 server.listen(port, () => {
     console.log(`Server up and running at ${port}`);

@@ -24,8 +24,13 @@ h6 {
     background-color: blanchedalmond;
 }
 
+.error {
+    color: red;
+}
+
 .form-action {
-    margin: auto 45%;
+    margin: auto 35%;
+    width: max-content;
 }
 
 .message-container {
