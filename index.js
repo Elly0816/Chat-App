@@ -1,15 +1,30 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const mongoose = require('mongoose');
+const http = require('http');
+const passportLocalMongoose = require('passport-local-mongoose');
+const { Server } = require('socket.io');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const session = require('express-session');
+
+
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-const mongoose = require('mongoose');
-const http = require('http');
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.set('trust proxy', 1)
+
 
 const server = http.createServer(app);
-const { Server } = require('socket.io');
-
 
 /*Creates the websocket */
 const io = new Server(server, {
@@ -50,19 +65,27 @@ const userSchema = new mongoose.Schema({
     requests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
+/*Add passport local mongoose to the user schema */
+userSchema.plugin(passportLocalMongoose);
+
 /*Create the models*/
 const User = mongoose.model('User', userSchema);
 const Message = mongoose.model('Message', messageSchema);
 const Chat = mongoose.model('Chat', chatSchema);
 
+/*Authenticate with local strategy */
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 
+/*
+
+            WEB SOCKET
 
 
-
-
-
-
+*/
 
 io.on('connection', (socket) => {
     console.log(`user ${socket.id} connected to the server`);
@@ -77,6 +100,14 @@ io.on('connection', (socket) => {
     });
 });
 
+
+/*
+
+                ROUTES
+
+
+
+*/
 
 app.post('/register', (req, res) => {
     const data = req.body;
