@@ -4,10 +4,8 @@ import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-export default function Login(){
+export default function Login(props){
 
-
-    const navigate = useNavigate();
 
     const endpoint = 'http://localhost:5000/';
 
@@ -26,6 +24,7 @@ export default function Login(){
                 })
                 .then(response => {
                     console.log(response);
+                    props.authenticate(true);
                 })
                 .catch(err => console.log(err));
             }
@@ -40,7 +39,9 @@ export default function Login(){
                 email: Email.value,
                 password: Password.value
             })
-            .then(response => { console.log(response);
+            .then(response => { 
+                console.log(response);
+                props.authenticate(true);
              })
              .catch(err => console.log(err));
         }

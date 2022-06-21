@@ -1,8 +1,18 @@
 import React from 'react';
+import Button from 'react-bootstrap/Button';
 
-export default function Header() {
+export default function Header(props) {
+
+    function logout(){
+        props.logout(false);
+    }
 
     return <div className='header'>
-        <h2>HiChat!</h2>
+        <div className='title'>
+            <h2>HiChat!</h2>
+        </div>
+        { props.isLogged && <div className='logout'>
+            <Button className='button' variant="light" onClick={ logout }>Logout</Button>
+        </div> }
     </div>
 }

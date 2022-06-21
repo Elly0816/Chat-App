@@ -17,11 +17,25 @@ h6 {
     background-color: navy;
     padding: 0.5em;
     color: white;
+    display: flex;
+    width: 100%;
 }
 
 .login {
     padding: 1em 15%;
     background-color: blanchedalmond;
+}
+
+.title {
+    width: 50%;
+}
+
+.logout {
+    width: 50%;
+}
+
+.logout .button {
+    float: right;
 }
 
 .error {
