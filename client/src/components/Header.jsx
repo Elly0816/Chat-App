@@ -5,6 +5,7 @@ export default function Header(props) {
 
     function logout(){
         props.logout(false);
+        localStorage.clear();
     }
 
     return <div className='header'>

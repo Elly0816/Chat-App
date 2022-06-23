@@ -20,6 +20,13 @@ export default function Login(props){
                                         email:"",
                                         password:"",
                                         password2:""});
+    
+    
+    /*This keeps track of whether the user already exists */
+    const [ exists, setExists ] = useState(false);
+
+    /*This checks if the login attempt was unsuccessful */
+    const [ loginFailure, setLoginFailure ] = useState(false);
 
 
     /*This toogles the form state between register and login */
@@ -38,22 +45,34 @@ export default function Login(props){
 
 
     /*Handles the submission of the register/login form */
-    function handleSubmit(e){
+    async function handleSubmit(e){
         e.preventDefault();
+        /*This handles registeration */
         if (register){
             const { firstName, lastName, email, password, password2 } = form;
             if ( password === password2 ){
-                axios.post(`${endpoint}register`, {
+                await axios.post(`${endpoint}register`, {
                     firstName: firstName,
                     lastName: lastName,
                     email: email,
                     password: password
                 })
                 .then(response => {
-                    localStorage.setItem('jwtToken', response.data.token);
-                    axios.defaults.headers.common['Authorization'] = 
-                    'Bearer'+response.data.token;
-                    props.authenticate({auth: true, user: response.data.user});
+                    console.log(response.data);
+                    if (response.data.response === 'login'){
+                        setRegister(false);
+                        setExists(true);
+                        setTimeout(() => {setExists(false)}, 6000);
+                    } else if (response.data.response === 'register'){
+                        setRegister(true);
+                    } else {
+                        console.log(response.data.user);
+                        /*This saves the user to the local storage for login persistence*/
+                        localStorage.setItem('user', JSON.stringify(response.data.user));
+                        axios.defaults.headers.common['Authorization'] = 
+                        'Bearer'+response.data.token;
+                        props.authenticate({auth: true, user: response.data.user});
+                    }
                 })
                 .catch(err => console.log(err));
             }
@@ -63,14 +82,26 @@ export default function Login(props){
             }
         }
         else {
+            /*This handles login */
             const { email, password } = form;
-            axios.post(`${endpoint}login`, {
+            await axios.post(`${endpoint}login`, {
                 email: email,
                 password: password
             })
             .then(response => { 
                 console.log(response);
-                props.authenticate(true);
+                if (response.data.response === 'login'){
+                    setRegister(false);
+                } else if (response.data.response === 'Incorrect Credentials'){
+                    setLoginFailure(true);
+                } else {
+                    console.log(response.data.user);
+                    /*This saves the user to the local storage for login persistence*/
+                    localStorage.setItem('user', JSON.stringify(response.data.user));
+                    axios.defaults.headers.common['Authorization'] =
+                    'Bearer'+response.data.token;
+                    props.authenticate({auth: true, user: response.data.user});
+                }
              })
              .catch(err => console.log(err));
         }
@@ -94,6 +125,12 @@ export default function Login(props){
     return <div className='login'>
         <Form onSubmit={ handleSubmit }>
 
+            { loginFailure && <div>
+                            <span className='error'>
+                                Invalid username or password!
+                            </span>
+                        </div> }
+
             { register && <Form.Group className="mb-3" controlId="firstName">
                 <Form.Label>First Name</Form.Label>
                 <Form.Control onChange={handleChange} name='firstName' value={form.firstName} type="text" placeholder="Enter First Name" />
@@ -116,6 +153,12 @@ export default function Login(props){
                 <Form.Label>Password</Form.Label>
                 <Form.Control onChange={handleChange} name='password' value={form.password} type="password" placeholder="Password" />
             </Form.Group>
+
+            { exists && <div>
+                            <span className='error'>
+                                This User already exists. Login instead.
+                            </span>
+                        </div> }
 
             { register && <Form.Group className="mb-3" controlId="Password2">
                 <Form.Label>Password</Form.Label>
