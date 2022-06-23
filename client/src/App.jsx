@@ -17,12 +17,12 @@ function App() {
 
   const [ messages, setMessages ] = useState([]);
 
-  const [ isAuthenticated, setIsAuthenticated ] = useState(false);
+  const [ user, setUser ] = useState({auth: false, user: {}});
 
   
   /*This handles the connection and disconnection to the socket */
   useEffect(() => {
-    if ( isAuthenticated ){
+    if ( user.auth ){
       const connectSocket = () => {setSocket(io.connect("http://localhost:5000"))};
       connectSocket();
     }else {
@@ -30,7 +30,7 @@ function App() {
         socket.disconnect(true);
       }
     }
-  }, [isAuthenticated])
+  }, [user]);
 
   /*Handles the sending of messages through the socket */
   if (socket){
@@ -56,20 +56,20 @@ function App() {
 
 
   function authenticate(status){
-   setIsAuthenticated(status);
+   setUser(status);
   }
 
 
   return (
     <div className='app'>
-      <Header logout={ authenticate } isLogged={ isAuthenticated }/>
+      <Header logout={ authenticate } user={ user }/>
       <Router>
         <Routes>
           <Route path="/login" element={ 
-            !isAuthenticated ? <Login 
+            !user.auth ? <Login 
                                 authenticate={ authenticate }/> : <Navigate to="/" /> } />
           <Route path="/" element={ 
-            isAuthenticated ? <div> 
+            user.auth ? <div> 
                                 <div className='message-container' ref={ messageContainer }>
                                   {messages.map((message, index) => <Messages 
                                   key={message+index} 

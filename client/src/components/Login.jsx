@@ -21,35 +21,39 @@ export default function Login(props){
                                         password:"",
                                         password2:""});
 
-    useEffect(() => {
-        if (register){
-            setForm({firstName:"",
-                 lastName:"",
-                  email:"",
-                   password:"",
-                    password2:""});        
-        }else{
-            setForm({email:"",
-            password:""});
-        }
-    }, [register]);
+
+    /*This toogles the form state between register and login */
+    // useEffect(() => {
+    //     if (register){
+    //         setForm({firstName:"",
+    //              lastName:"",
+    //               email:"",
+    //                password:"",
+    //                 password2:""});        
+    //     }else{
+    //         setForm({email:"",
+    //         password:""});
+    //     }
+    // }, [register]);
 
 
     /*Handles the submission of the register/login form */
     function handleSubmit(e){
         e.preventDefault();
         if (register){
-            const { firstName, lastName, Email, Password, Password2 } = e.target;
-            if ( Password.value === Password2.value ){
+            const { firstName, lastName, email, password, password2 } = form;
+            if ( password === password2 ){
                 axios.post(`${endpoint}register`, {
-                    firstName: firstName.value,
-                    lastName: lastName.value,
-                    email: Email.value,
-                    password: Password.value
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    password: password
                 })
                 .then(response => {
-                    console.log(response);
-                    props.authenticate(true);
+                    localStorage.setItem('jwtToken', response.data.token);
+                    axios.defaults.headers.common['Authorization'] = 
+                    'Bearer'+response.data.token;
+                    props.authenticate({auth: true, user: response.data.user});
                 })
                 .catch(err => console.log(err));
             }
@@ -59,10 +63,10 @@ export default function Login(props){
             }
         }
         else {
-            const { Email, Password } = e.target;
+            const { email, password } = form;
             axios.post(`${endpoint}login`, {
-                email: Email.value,
-                password: Password.value
+                email: email,
+                password: password
             })
             .then(response => { 
                 console.log(response);

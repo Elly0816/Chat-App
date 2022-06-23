@@ -6,15 +6,17 @@ const http = require('http');
 const passportLocalMongoose = require('passport-local-mongoose');
 const { Server } = require('socket.io');
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
 
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'keyboard cat',
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: { secure: true }
@@ -29,7 +31,7 @@ const server = http.createServer(app);
 /*Creates the websocket */
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:3000',
+        origin: process.env.CLIENT,
         methods: ["GET", "POST"]
     }
 });
@@ -56,6 +58,7 @@ const chatSchema = new mongoose.Schema({
 
 /*User Schema */
 const userSchema = new mongoose.Schema({
+    userName: String,
     firstName: String,
     lastName: String,
     email: String,
@@ -74,7 +77,7 @@ const Message = mongoose.model('Message', messageSchema);
 const Chat = mongoose.model('Chat', chatSchema);
 
 /*Authenticate with local strategy */
-passport.use(new LocalStrategy(User.authenticate()));
+passport.use(User.createStrategy());
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
@@ -112,7 +115,43 @@ io.on('connection', (socket) => {
 app.post('/register', (req, res) => {
     const data = req.body;
     console.log(data);
-    res.send(data);
+    User.register(new User({
+        username: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+    }), password = data.password, (err) => {
+        if (err) {
+            console.log(err);
+            console.log("There was an error with registering the user");
+            res.send({ response: 'register' })
+        } else {
+            console.log('No error in registering the user');
+            const authenticate = User.authenticate('local');
+            authenticate(data.email, data.password, (err, user) => {
+                if (err) {
+                    console.log(err);
+                    console.log("There was an error with authenticating the user");
+                    res.send({ response: 'register' });
+                } else {
+                    console.log("No error in authenticating the user");
+                    req.login(user, (err) => {
+                        if (err) {
+                            console.log("There was a error with logging in the user after registeration");
+                            console.log(err);
+                        } else {
+                            console.log("Logged in after registeration");
+                            console.log('Registering, redirecting to messages page');
+                            //Jwt of the user
+                            token = jwt.sign({ id: user._id }, process.env.SECRET, { expiresIn: '1h' });
+                            console.log(user);
+                            res.send({ token: token, user: user });
+                        }
+                    });
+                }
+            });
+        }
+    });
 });
 
 app.post('/login', (req, res) => {
