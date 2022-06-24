@@ -27,11 +27,15 @@ h6 {
 }
 
 .title {
-    width: 50%;
+    width: 33%;
+}
+
+.search {
+    width: 33%;
 }
 
 .logout {
-    width: 50%;
+    width: 33%;
 }
 
 .logout .button {

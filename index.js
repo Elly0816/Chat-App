@@ -61,6 +61,7 @@ const userSchema = new mongoose.Schema({
     userName: String,
     firstName: String,
     lastName: String,
+    fullName: String,
     email: String,
     password: String,
     connections: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
@@ -97,9 +98,28 @@ io.on('connection', (socket) => {
         console.log(`user ${socket.id} disconnected from the server`);
     });
 
+
+    /*This sends a message to the user currently being chatted with */
     socket.on('send', (arg) => {
         console.log(arg);
         socket.emit('send', arg);
+    });
+
+
+    /*This searches the database for a matching username */
+    socket.on('search', (arg) => {
+        const regex = new RegExp(arg, 'i');
+        User.find({ fullName: { $regex: regex } }, (err, users) => {
+            if (err) {
+                console.log(err);
+            } else {
+                if (!users) {
+                    socket.emit('search', 'No users found');
+                } else {
+                    socket.emit('search', users);
+                }
+            }
+        });
     });
 });
 
@@ -127,6 +147,7 @@ app.post('/register', (req, res) => {
                 username: data.email,
                 firstName: data.firstName,
                 lastName: data.lastName,
+                fullName: `${data.firstName} ${data.lastName}`,
                 email: data.email,
             }), password = data.password, (err) => {
                 if (err) {

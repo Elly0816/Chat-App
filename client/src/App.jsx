@@ -18,12 +18,13 @@ function App() {
   const [ messages, setMessages ] = useState([]);
 
   const [ user, setUser ] = useState({auth: false, user: {}});
+  
 
   
   /*This checks if a user has previously logged in */
   useEffect(() => {
     const loggedInUser = localStorage.getItem('user');
-    console.log(JSON.stringify(loggedInUser));
+    // console.log(JSON.stringify(loggedInUser));
     if (loggedInUser){
       const foundUser = JSON.parse(loggedInUser);
       setUser({auth: true, user: foundUser});
@@ -72,7 +73,7 @@ function App() {
 
   return (
     <div className='app'>
-      <Header logout={ authenticate } user={ user }/>
+      <Header logout={ authenticate } user={ user } socket={ socket }/>
       <Router>
         <Routes>
           <Route path="/login" element={ 
