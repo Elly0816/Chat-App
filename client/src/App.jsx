@@ -6,6 +6,7 @@ import Messages from './components/Messages';
 import  io from 'socket.io-client';
 import Entry from './components/Entry';
 import Login from './components/Login';
+import Info from './components/Info';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 
@@ -13,11 +14,14 @@ function App() {
 
   let sendMessage;
 
+  const endpoint = 'http://localhost:5000/';
+
   const [ socket, setSocket ] = useState();
 
   const [ messages, setMessages ] = useState([]);
 
   const [ user, setUser ] = useState({auth: false, user: {}});
+
   
 
   
@@ -34,8 +38,11 @@ function App() {
   /*This handles the connection and disconnection to the socket */
   useEffect(() => {
     if ( user.auth ){
-      const connectSocket = () => {setSocket(io.connect("http://localhost:5000"))};
-      connectSocket();
+      if (!socket){
+        const connectSocket = () => {setSocket(io.connect("http://localhost:5000"))};
+        connectSocket();
+      }
+      
     }else {
       if (socket){
         socket.disconnect(true);
@@ -73,11 +80,16 @@ function App() {
 
   return (
     <div className='app'>
-      <Header logout={ authenticate } user={ user } socket={ socket }/>
       <Router>
+        <Header logout={ authenticate } user={ user } socket={ socket }/>
         <Routes>
+          {/* { user.auth ? <Route path="/profile/:id" element={ <Info endpoint={endpoint}/> }/> :
+            <Navigate to="/login"/>} */}
+          {/* <Route path="/profile/:id" element={user.auth ? <Info endpoint={ endpoint } /> :
+                                   <Navigate to='/login'/>} /> */}
+          <Route path="/profile/:id" element={<Info endpoint={ endpoint } /> } />
           <Route path="/login" element={ 
-            !user.auth ? <Login 
+            !user.auth ? <Login endpoint={ endpoint }
                                 authenticate={ authenticate }/> : <Navigate to="/" /> } />
           <Route path="/" element={ 
             user.auth ? <div> 

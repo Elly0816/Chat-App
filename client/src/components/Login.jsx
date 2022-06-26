@@ -6,7 +6,7 @@ import axios from 'axios';
 export default function Login(props){
 
 
-    const endpoint = 'http://localhost:5000/';
+    
 
     /*Checks if the user wants to register or login */
     const [ register, setRegister ] = useState(false);
@@ -51,7 +51,7 @@ export default function Login(props){
         if (register){
             const { firstName, lastName, email, password, password2 } = form;
             if ( password === password2 ){
-                await axios.post(`${endpoint}register`, {
+                await axios.post(`${props.endpoint}register`, {
                     firstName: firstName,
                     lastName: lastName,
                     email: email,
@@ -84,7 +84,7 @@ export default function Login(props){
         else {
             /*This handles login */
             const { email, password } = form;
-            await axios.post(`${endpoint}login`, {
+            await axios.post(`${props.endpoint}login`, {
                 email: email,
                 password: password
             })

@@ -132,6 +132,8 @@ io.on('connection', (socket) => {
 
 */
 
+
+/*This is the register route */
 app.post('/register', (req, res) => {
     const data = req.body;
     console.log(data);
@@ -185,6 +187,8 @@ app.post('/register', (req, res) => {
     });
 });
 
+
+/*This is the login route */
 app.post('/login', (req, res) => {
     const data = req.body;
     console.log(data);
@@ -208,6 +212,27 @@ app.post('/login', (req, res) => {
                     res.send({ token: token, user: user });
                 }
             });
+        }
+    });
+});
+
+
+/*Logout route */
+
+
+
+/*Profile route*/
+app.get('/profile/:id', (req, res) => {
+    const id = req.params.id;
+    User.findById(id, (err, user) => {
+        if (err) {
+            console.log(err);
+        } else if (!user) {
+            console.log("This user does not exist");
+            res.send({ response: '404 Not Found!' });
+        } else {
+            console.log(`This is the user: ${user}`);
+            res.send({ response: user });
         }
     });
 });

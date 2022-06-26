@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Search from './Search';
 import { Search as SearchIcon } from 'react-bootstrap-icons';
+import { useNavigate } from 'react-router-dom';
+
+
 
 export default function Header(props) {
 
@@ -16,9 +19,17 @@ export default function Header(props) {
         setOpenSearch(!openSearch);
     }
 
+    const navigate = useNavigate();
+
+    function goToProfile(){
+        console.log(props.user.user);
+        navigate(`profile/${props.user.user._id}`);
+    }
+
+
     return <div className='header'>
         <div className='title'>
-            <h2>HiChat!</h2>
+            <a href='/' style={{textDecoration: 'None', color:'white'}}><h2>HiChat!</h2></a>
             { props.user.auth && <h6>Welcome {props.user.user.fullName}</h6>}
         </div>
 
@@ -36,6 +47,7 @@ export default function Header(props) {
                             </div> }
         
         { props.user.auth && <div className='logout'>
+            <Button variant="light" onClick={goToProfile}>Profile</Button>
             <Button className='button' variant="light" onClick={ logout }>Logout</Button>
         </div> }
     </div>

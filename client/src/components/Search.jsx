@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import { X } from 'react-bootstrap-icons';
+import { useNavigate } from 'react-router';
 
 export default function Search(props){
 
@@ -8,10 +9,6 @@ export default function Search(props){
 
     const [ users, setUsers ] = useState([]);
 
-    /*This searches for users in the database */
-    // useEffect(() => {
-    //     props.socket.emit('search', search);
-    // }, [search]);
 
     function handleChange(e){
         setSearch(e.target.value);
@@ -19,18 +16,26 @@ export default function Search(props){
             props.socket.emit('search', search);
             await props.socket.on('search', (arg) => {
                 setUsers(arg);
+                arg.forEach(user => {console.log(user.username);});
                 console.log(users);
             });
         }
         listenforUsers();
     }
 
-    // props.socket.on('search', (arg)=>{
-    //     setUsers(arg);
-    //     console.log(arg);
-    // });
+    const navigate = useNavigate(); 
+    
+    /*This handles the submission of the form */
+    function handleSubmit(e){
+        e.preventDefault();
+        if (users.length === 1 ){
+            navigate(`/profile/${users[0]._id}`);
+            props.close();
+        }
+    }
 
-    return <Form className="d-flex">
+
+    return <Form className="d-flex" onSubmit={handleSubmit}>
         <Form.Control
           autoFocus={true} 
           onChange={handleChange}
@@ -44,8 +49,7 @@ export default function Search(props){
         <X onClick={props.close} style={{fontSize: '300%'}}/>
         { users.length > 0 && <datalist id='search-results'>
             { users.map(user => {
-                return <option key={user._id}>
-                {user.username}</option>
+                return <option key={user._id}>{user.username}</option>
             })}
         </datalist> }
       </Form>
