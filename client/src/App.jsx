@@ -87,7 +87,7 @@ function App() {
             <Navigate to="/login"/>} */}
           {/* <Route path="/profile/:id" element={user.auth ? <Info endpoint={ endpoint } /> :
                                    <Navigate to='/login'/>} /> */}
-          <Route path="/profile/:id" element={<Info endpoint={ endpoint } /> } />
+          <Route path="/profile/:id" element={<Info user={ user } endpoint={ endpoint } /> } />
           <Route path="/login" element={ 
             !user.auth ? <Login endpoint={ endpoint }
                                 authenticate={ authenticate }/> : <Navigate to="/" /> } />

@@ -9,15 +9,13 @@ export default function Search(props){
 
     const [ users, setUsers ] = useState([]);
 
-
+/*Searches the database for the users matching the input in the form via websocket */
     function handleChange(e){
         setSearch(e.target.value);
         async function listenforUsers(){
             props.socket.emit('search', search);
             await props.socket.on('search', (arg) => {
                 setUsers(arg);
-                arg.forEach(user => {console.log(user.username);});
-                console.log(users);
             });
         }
         listenforUsers();
