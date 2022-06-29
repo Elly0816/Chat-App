@@ -222,20 +222,36 @@ app.post('/login', (req, res) => {
 
 
 /*Profile route*/
-app.get('/profile/:id', (req, res) => {
-    const id = req.params.id;
-    User.findById(id, (err, user) => {
-        if (err) {
-            console.log(err);
-        } else if (!user) {
-            console.log("This user does not exist");
-            res.send({ response: '404 Not Found!' });
-        } else {
-            console.log(`This is the user: ${user}`);
-            res.send({ response: user });
-        }
+/*Get returns the user details to the client while Post edits the user info such as name and email */
+app.route('/profile/:id')
+    .get((req, res) => {
+        const id = req.params.id;
+        User.findById(id, (err, user) => {
+            if (err) {
+                console.log(err);
+            } else if (!user) {
+                console.log("This user does not exist");
+                res.send({ response: 'User not found!' });
+            } else {
+                console.log(`This is the user: ${user}`);
+                res.send({ response: user });
+            }
+        });
+    })
+    .patch((req, res) => {
+        const id = req.params.id;
+        User.findByIdAndUpdate(id, { $set: req.body }, { new: true }, (err, user) => {
+            if (err) {
+                console.log("There was an error with the database");
+            } else if (!user) {
+                console.log("There was no user found");
+                res.send({ response: 'User not found' });
+            } else {
+                console.log('The user was updated successfully');
+                res.send({ response: user });
+            }
+        });
     });
-});
 
 
 

@@ -23,8 +23,6 @@ function App() {
   const [ user, setUser ] = useState({auth: false, user: {}});
 
   
-
-  
   /*This checks if a user has previously logged in */
   useEffect(() => {
     const loggedInUser = localStorage.getItem('user');
@@ -77,6 +75,11 @@ function App() {
    setUser(status);
   }
 
+  /*This changes the user.user whenever the user edits their account */
+  function newUser(user){
+    setUser(user);
+  }
+
 
   return (
     <div className='app'>
@@ -87,7 +90,7 @@ function App() {
             <Navigate to="/login"/>} */}
           {/* <Route path="/profile/:id" element={user.auth ? <Info endpoint={ endpoint } /> :
                                    <Navigate to='/login'/>} /> */}
-          <Route path="/profile/:id" element={<Info user={ user } endpoint={ endpoint } /> } />
+          <Route path="/profile/:id" element={<Info changeUser={ newUser } user={ user } endpoint={ endpoint } /> } />
           <Route path="/login" element={ 
             !user.auth ? <Login endpoint={ endpoint }
                                 authenticate={ authenticate }/> : <Navigate to="/" /> } />
