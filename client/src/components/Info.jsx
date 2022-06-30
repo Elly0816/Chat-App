@@ -29,19 +29,22 @@ export default function Info(props){
                 console.log(response.data.response);
                 setProfile(response.data.response);
                 console.log(`The id is: ${id}`);
-                if ((id === props.user.user._id) || (profile._id === props.user.user._id)){
+                if (id === props.user.user._id){
                     setIsUser(true);
                 } else {
                     setIsUser(false);
                 }
-            })
+                if ((profile.connections.includes(props.user.user._id)) || 
+                (profile.requests.includes(props.user.user._id))) {
+                    setReqDisabled(true);
+                }})
             .catch(err => {
                 console.log(err);
             });
         }
         getDetails();
         
-    }, [id, profile._id, props.endpoint, props.user.user]);
+    }, [id, profile._id]);
 
 
     /*Function to change the details of the user */
@@ -87,6 +90,10 @@ export default function Info(props){
         requestSender(); 
     }
 
+    function getRequests(e){
+        navigate(`/request/${props.user.user._id}`);
+    }
+
     return <div>
                     <h2>{profile.fullName}</h2>
                     <div className='info'>
@@ -106,12 +113,21 @@ export default function Info(props){
                     </div>
                         
                         <div className='info-2'>
-                            <span>Connections:</span>
-                            <h6>{ profile.connections && profile.connections.length }</h6>
-                            { isUser && <span>Requests:</span> }
-                            { isUser &&<h6>{ profile.requests && profile.requests.length }</h6> }
-                            { isUser && <span>Pending Requests:</span>}
-                            { isUser && <h6>{ props.user.user.pendingRequests.length }</h6> }
+                            { profile.connections && <div>
+                                <span>Connections:</span>
+                                <h6>{ profile.connections.length }</h6>
+                            </div> }
+
+                            { (isUser && profile.requests) && <div onClick={ getRequests }>
+                                <span>Requests:</span>
+                                <h6>{ profile.requests.length }</h6>
+                            </div> }
+
+                            { isUser && <div>
+                                <span>Pending Requests:</span>
+                                <h6>{ props.user.user.pendingRequests.length }</h6>
+                            </div> }
+                            
                             { !isUser && <Button onClick={sendRequest} disabled={reqDisabled} type='primary'>Send Request</Button>}    
                         </div>  
 

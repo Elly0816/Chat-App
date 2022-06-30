@@ -7,6 +7,7 @@ import  io from 'socket.io-client';
 import Entry from './components/Entry';
 import Login from './components/Login';
 import Info from './components/Info';
+import People from './components/People';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 
@@ -104,6 +105,8 @@ function App() {
                                 </div> 
                                 <Entry sendMessage={sendMessage}/> 
                               </div> : <Navigate to="/login" /> }/>
+          <Route path="/request/:id" element={ user.auth ? <People request='request' endpoint={ endpoint } user={ user }/> :
+           <Navigate to="/login" /> } />
         </Routes>
       </Router>
     </div>

@@ -265,21 +265,20 @@ app.route("/request/:id")
                 res.send({ response: "This user does not exist" });
             } else {
                 /*This is a list of user id's in the requests field */
-                const requests = user.requests;
-                const pending = user.pendingRequests;
-                const users = requests.map(request => {
-                    User.findById(request, ['_id', 'firstName', 'lastName', 'fullName', 'email'], (err, user) => {
+                const requests = user.requests.map(item => item.toString());
+                const pending = user.pendingRequests.map(item => item.toString());
+                console.log(requests);
+                User.find({ '_id': { $in: requests } }, ['_id', 'firstName', 'lastName', 'fullName'],
+                    (err, users) => {
                         if (err) {
                             console.log(err);
-                        } else if (!user) {
-                            console.log("The user in the requests does not exist");
+                        } else if (!users) {
+                            console.log("There were no users found");
                         } else {
-                            console.log("The user in the request was found");
+                            res.send({ users: users, pending: pending });
                         }
                     });
-                });
                 /*This returns an array of users that are in the requests field and user ids in the pending requests field */
-                res.send({ users: users, pending: pending });
             }
         });
     })
