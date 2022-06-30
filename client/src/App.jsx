@@ -44,6 +44,7 @@ function App() {
     }else {
       if (socket){
         socket.disconnect(true);
+        setSocket();
       }
     }
   }, [user]);
@@ -75,10 +76,10 @@ function App() {
    setUser(status);
   }
 
-  /*This changes the user.user whenever the user edits their account */
-  function newUser(user){
-    setUser(user);
-  }
+  // /*This changes the user.user whenever the user edits their account */
+  // function newUser(user){
+  //   setUser(user);
+  // }
 
 
   return (
@@ -90,7 +91,7 @@ function App() {
             <Navigate to="/login"/>} */}
           {/* <Route path="/profile/:id" element={user.auth ? <Info endpoint={ endpoint } /> :
                                    <Navigate to='/login'/>} /> */}
-          <Route path="/profile/:id" element={<Info changeUser={ newUser } user={ user } endpoint={ endpoint } /> } />
+          <Route path="/profile/:id" element={<Info changeUser={ authenticate } user={ user } endpoint={ endpoint } /> } />
           <Route path="/login" element={ 
             !user.auth ? <Login endpoint={ endpoint }
                                 authenticate={ authenticate }/> : <Navigate to="/" /> } />

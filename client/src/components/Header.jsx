@@ -8,9 +8,12 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Header(props) {
 
+    const navigate = useNavigate();
+
     function logout(){
         props.logout(false);
         localStorage.clear();
+        navigate("/login");
     }
 
     const [ openSearch, setOpenSearch ] = useState(false);
@@ -19,7 +22,6 @@ export default function Header(props) {
         setOpenSearch(!openSearch);
     }
 
-    const navigate = useNavigate();
 
     function goToProfile(){
         console.log(props.user.user);

@@ -44,16 +44,15 @@ const port = 5000;
 
 const messageSchema = new mongoose.Schema({
     text: String,
+    sender: String,
+    receiver: String,
     time: { type: Date, default: Date.now }
 });
 
 /*Schema for chats*/
 const chatSchema = new mongoose.Schema({
-    with: String,
-    messages: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Message'
-    }]
+    between: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    messages: [messageSchema]
 });
 
 /*User Schema */
@@ -65,7 +64,8 @@ const userSchema = new mongoose.Schema({
     email: String,
     password: String,
     connections: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    chats: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chat' }],
+    chats: [chatSchema],
+    pendingRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     requests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
@@ -226,7 +226,7 @@ app.post('/login', (req, res) => {
 app.route('/profile/:id')
     .get((req, res) => {
         const id = req.params.id;
-        User.findById(id, (err, user) => {
+        User.findById(id, ['_id', 'firstName', 'lastName', 'fullName', 'email', 'connections', 'requests', 'pendingRequests'], (err, user) => {
             if (err) {
                 console.log(err);
             } else if (!user) {
@@ -240,9 +240,9 @@ app.route('/profile/:id')
     })
     .patch((req, res) => {
         const id = req.params.id;
-        User.findByIdAndUpdate(id, { $set: req.body }, { new: true }, (err, user) => {
+        User.findByIdAndUpdate(id, { $set: req.body }, { new: true, projection: ['_id', 'firstName', 'lastName', 'fullName', 'email'] }, (err, user) => {
             if (err) {
-                console.log("There was an error with the database");
+                console.log(err);
             } else if (!user) {
                 console.log("There was no user found");
                 res.send({ response: 'User not found' });
@@ -253,7 +253,71 @@ app.route('/profile/:id')
         });
     });
 
+/*Handle connection requests */
+app.route("/request/:id")
+    .get((req, res) => {
+        const id = req.params.id;
+        User.findById(id, ['requests', 'pendingRequests'], (err, user) => {
+            if (err) {
+                console.log(err);
+            } else if (!user) {
+                console.log("The user does not exist");
+                res.send({ response: "This user does not exist" });
+            } else {
+                /*This is a list of user id's in the requests field */
+                const requests = user.requests;
+                const pending = user.pendingRequests;
+                const users = requests.map(request => {
+                    User.findById(request, ['_id', 'firstName', 'lastName', 'fullName', 'email'], (err, user) => {
+                        if (err) {
+                            console.log(err);
+                        } else if (!user) {
+                            console.log("The user in the requests does not exist");
+                        } else {
+                            console.log("The user in the request was found");
+                        }
+                    });
+                });
+                /*This returns an array of users that are in the requests field and user ids in the pending requests field */
+                res.send({ users: users, pending: pending });
+            }
+        });
+    })
+    .post((req, res) => {
+        const id = req.params.id;
+        const requestTo = req.body.id;
+        User.findByIdAndUpdate(requestTo, { $push: { requests: id } }, (err, user) => {
+            if (err) {
+                console.log(err);
+            } else if (!user) {
+                console.log("The user you're sending the request to does not exist");
+            } else {
+                console.log("The request was sent successfully");
+                /*Add the id the request was sent to to the current users' pending requests */
+                User.findByIdAndUpdate(id, { $push: { pendingRequests: requestTo } }, { new: true },
+                    (err, user) => {
+                        if (err) {
+                            console.log(err);
+                        } else if (!user) {
+                            console.log("The user to add the pending request to was not found")
+                        } else {
+                            console.log("The request was added to your pending request");
+                            res.send({ user: user });
+                        }
+                    });
 
+            }
+        });
+
+    })
+    .delete((req, res) => {
+        const id = req.params.id;
+        const requestFrom = req.body.id;
+    });
+
+
+app.route("/connection/:id")
+    .get().post().delete()
 
 
 server.listen(port, () => {

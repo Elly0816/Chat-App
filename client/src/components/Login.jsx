@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login(props){
 
 
-    
+    const navigate = useNavigate();
 
     /*Checks if the user wants to register or login */
     const [ register, setRegister ] = useState(false);
@@ -72,6 +73,7 @@ export default function Login(props){
                         axios.defaults.headers.common['Authorization'] = 
                         'Bearer'+response.data.token;
                         props.authenticate({auth: true, user: response.data.user});
+                        navigate("/");
                     }
                 })
                 .catch(err => console.log(err));
@@ -101,6 +103,7 @@ export default function Login(props){
                     axios.defaults.headers.common['Authorization'] =
                     'Bearer'+response.data.token;
                     props.authenticate({auth: true, user: response.data.user});
+                    navigate('/');
                 }
              })
              .catch(err => console.log(err));
