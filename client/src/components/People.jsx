@@ -19,7 +19,8 @@ export default function People(props){
             if (request !== 'pendingRequests') {
                 await axios.get(`${props.endpoint}${request}/${id}`)
                 .then(response => 
-                {   setTitle(`${lodash.capitalize(request)}s`);
+                {   
+                    setTitle(`${lodash.capitalize(request)}s`);
                     setPeople(response.data.users);
                     console.log(response.data);
                 }
@@ -40,9 +41,9 @@ export default function People(props){
         getPeople();
     }, [id, request, props.user, props.endpoint]);
 
-    function handleClick(id, subUrl, method){
-        if (method === 'patch'){
-            axios.patch(`${props.endpoint}${subUrl}/${props.user.user._id}`, {id: id})
+    function handleClick(id, todo){
+        if (todo === 'cancel sent request'){
+            axios.patch(`${props.endpoint}pending-requests/${props.user.user._id}`, {id: id})
             .then(response => {
                 props.setUser({auth: true, user: response.data.user})
                 setPeople(people.filter((person) => person._id !== id));
@@ -58,7 +59,7 @@ export default function People(props){
         { people && people.map(person => <div style={{display:'flex'}} key={person._id} className='person'>
         <a style={{textDecoration:'none', color:'black'}} href={`/profile/${person._id}`}><h5>{ person.fullName}</h5></a>
         {title==='Pending Requests' && <Button
-         onClick={() => handleClick(person._id, 'pending-requests', 'patch')} 
+         onClick={() => handleClick(person._id, 'cancel sent request')} 
          style={{margin: '0 10px'}} variant='danger'>Cancel Request</Button>}
         {title === 'Requests' && <div>
                                     <Button style={{margin: '0 10px'}} variant='success'>Accept</Button>
