@@ -21,7 +21,7 @@ function App() {
 
   const [ messages, setMessages ] = useState([]);
 
-  const [ user, setUser ] = useState({auth: false, user: {}});
+  const [ user, setUser ] = useState({auth: null, user: {}});
 
   
   /*This checks if a user has previously logged in */
@@ -38,8 +38,7 @@ function App() {
   useEffect(() => {
     if ( user.auth ){
       if (!socket){
-        const connectSocket = () => {setSocket(io.connect("http://localhost:5000"))};
-        connectSocket();
+        setSocket(io.connect("http://localhost:5000"));
       }
       
     }else {
@@ -105,8 +104,7 @@ function App() {
                                 </div> 
                                 <Entry sendMessage={sendMessage}/> 
                               </div> : <Navigate to="/login" /> }/>
-          <Route path="/request/:id" element={ user.auth ? <People request='request' endpoint={ endpoint } user={ user }/> :
-           <Navigate to="/login" /> } />
+          {user.auth && <Route path="/:request/:id" element={ <People setUser={ setUser } user={ user } endpoint={ endpoint }/> } />}
         </Routes>
       </Router>
     </div>

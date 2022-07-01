@@ -253,6 +253,8 @@ app.route('/profile/:id')
         });
     });
 
+
+
 /*Handle connection requests */
 app.route("/request/:id")
     .get((req, res) => {
@@ -275,7 +277,17 @@ app.route("/request/:id")
                         } else if (!users) {
                             console.log("There were no users found");
                         } else {
-                            res.send({ users: users, pending: pending });
+                            // res.send({ users: users, pending: pending });
+                            User.find({ '_id': { $in: pending } }, ['_id', 'firstName', 'lastName', 'fullName'],
+                                (err, pendings) => {
+                                    if (err) {
+                                        console.log(err);
+                                    } else if (!pendings) {
+                                        console.log("There were no users found");
+                                    } else {
+                                        res.send({ users: users, pending: pendings });
+                                    }
+                                });
                         }
                     });
                 /*This returns an array of users that are in the requests field and user ids in the pending requests field */
@@ -285,35 +297,63 @@ app.route("/request/:id")
     .post((req, res) => {
         const id = req.params.id;
         const requestTo = req.body.id;
-        User.findByIdAndUpdate(requestTo, { $push: { requests: id } }, (err, user) => {
-            if (err) {
-                console.log(err);
-            } else if (!user) {
-                console.log("The user you're sending the request to does not exist");
-            } else {
-                console.log("The request was sent successfully");
-                /*Add the id the request was sent to to the current users' pending requests */
-                User.findByIdAndUpdate(id, { $push: { pendingRequests: requestTo } }, { new: true },
-                    (err, user) => {
-                        if (err) {
-                            console.log(err);
-                        } else if (!user) {
-                            console.log("The user to add the pending request to was not found")
-                        } else {
-                            console.log("The request was added to your pending request");
-                            res.send({ user: user });
-                        }
-                    });
+        User.findByIdAndUpdate(requestTo, { $push: { requests: id } }, { new: true },
+            (err, user) => {
+                if (err) {
+                    console.log(err);
+                } else if (!user) {
+                    console.log("The user you're sending the request to does not exist");
+                } else {
+                    console.log("The request was sent successfully");
+                    /*Add the id the request was sent to to the current users' pending requests */
+                    User.findByIdAndUpdate(id, { $push: { pendingRequests: requestTo } }, { new: true },
+                        (err, user) => {
+                            if (err) {
+                                console.log(err);
+                            } else if (!user) {
+                                console.log("The user to add the pending request to was not found")
+                            } else {
+                                console.log("The request was added to your pending request");
+                                res.send({ user: user });
+                            }
+                        });
 
-            }
-        });
+                }
+            });
 
     })
     .delete((req, res) => {
         const id = req.params.id;
         const requestFrom = req.body.id;
+        User.findOneAndUpdate()
     });
 
+/*Route to handle pending requests by deleting them */
+app.patch('/pending-requests/:id', (req, res) => {
+    const id = req.params.id;
+    const toDelete = req.body.id;
+    User.findByIdAndUpdate(toDelete, { $pull: { requests: id } }, { new: true },
+        (err, user) => {
+            if (err) {
+                console.log(err);
+            } else if (!user) {
+                console.log("The user the request was sent to was not found");
+            } else {
+                console.log("Your request was removed from the user's list of requests");
+                User.findByIdAndUpdate(id, { $pull: { pendingRequests: toDelete } }, { new: true },
+                    (err, user) => {
+                        if (err) {
+                            console.log(err);
+                        } else if (!user) {
+                            console.log("The user was not found");
+                        } else {
+                            console.log("The user was removed from your list of pending requests");
+                            res.send({ user: user });
+                        }
+                    })
+            }
+        })
+});
 
 app.route("/connection/:id")
     .get().post().delete()

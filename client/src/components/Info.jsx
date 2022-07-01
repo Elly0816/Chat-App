@@ -90,8 +90,8 @@ export default function Info(props){
         requestSender(); 
     }
 
-    function getRequests(e){
-        navigate(`/request/${props.user.user._id}`);
+    function getRequests(request){
+        navigate(`/${request}/${props.user.user._id}`);
     }
 
     return <div>
@@ -118,17 +118,17 @@ export default function Info(props){
                                 <h6>{ profile.connections.length }</h6>
                             </div> }
 
-                            { (isUser && profile.requests) && <div onClick={ getRequests }>
+                            { (isUser && profile.requests) && <div onClick={ () => getRequests('request') }>
                                 <span>Requests:</span>
                                 <h6>{ profile.requests.length }</h6>
                             </div> }
 
-                            { isUser && <div>
+                            { isUser && <div onClick={ () => getRequests('pendingRequests') }>
                                 <span>Pending Requests:</span>
                                 <h6>{ props.user.user.pendingRequests.length }</h6>
                             </div> }
                             
-                            { !isUser && <Button onClick={sendRequest} disabled={reqDisabled} type='primary'>Send Request</Button>}    
+                            {props.user.auth &&  !isUser && <Button onClick={(sendRequest)} disabled={reqDisabled} type='primary'>{reqDisabled ? 'Request Sent' : 'Send Request'}</Button>}    
                         </div>  
 
                     </div>
