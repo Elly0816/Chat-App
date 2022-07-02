@@ -238,6 +238,7 @@ app.route('/profile/:id')
             }
         });
     })
+    // Patch updates the body of the user 
     .patch((req, res) => {
         const id = req.params.id;
         User.findByIdAndUpdate(id, { $set: req.body }, { new: true, projection: ['_id', 'firstName', 'lastName', 'fullName', 'email'] }, (err, user) => {
@@ -277,7 +278,6 @@ app.route("/request/:id")
                         } else if (!users) {
                             console.log("There were no users found");
                         } else {
-                            // res.send({ users: users, pending: pending });
                             User.find({ '_id': { $in: pending } }, ['_id', 'firstName', 'lastName', 'fullName'],
                                 (err, pendings) => {
                                     if (err) {
@@ -297,6 +297,7 @@ app.route("/request/:id")
     .post((req, res) => {
         const id = req.params.id;
         const requestTo = req.body.id;
+        //Add current user to other user's requests list
         User.findByIdAndUpdate(requestTo, { $push: { requests: id } }, { new: true },
             (err, user) => {
                 if (err) {
@@ -325,6 +326,7 @@ app.route("/request/:id")
     .patch((req, res) => {
         const id = req.params.id;
         const requestFrom = req.body.id;
+        //Remove current user from other user's pending request list
         User.findByIdAndUpdate(requestFrom, { $pull: { pendingRequests: id } }, { new: true },
             (err, user) => {
                 if (err) {
@@ -333,6 +335,7 @@ app.route("/request/:id")
                     console.log("The user the request was sent from was not found");
                 } else {
                     console.log("You were removed from their pending requests");
+                    //Remove other user from current user's requests list
                     User.findByIdAndUpdate(id, { $pull: { requests: requestFrom } }, { new: true },
                         (err, user) => {
                             if (err) {
@@ -352,6 +355,7 @@ app.route("/request/:id")
 app.patch('/pending-requests/:id', (req, res) => {
     const id = req.params.id;
     const toDelete = req.body.id;
+    //Remove the current user from the other user's requests
     User.findByIdAndUpdate(toDelete, { $pull: { requests: id } }, { new: true },
         (err, user) => {
             if (err) {
@@ -360,6 +364,7 @@ app.patch('/pending-requests/:id', (req, res) => {
                 console.log("The user the request was sent to was not found");
             } else {
                 console.log("Your request was removed from the user's list of requests");
+                //Remove the other user from the current user's pending requests
                 User.findByIdAndUpdate(id, { $pull: { pendingRequests: toDelete } }, { new: true },
                     (err, user) => {
                         if (err) {
@@ -386,6 +391,7 @@ app.route("/connection/:id")
             } else {
                 console.log("Your account was found");
                 const connections = user.connections.map(connection => connection.toString());
+                //Find the users that have id's in the current users' connections
                 User.find({ '_id': { $in: connections } }, ['_id', 'firstName', 'lastName', 'fullName'],
                     (err, users) => {
                         if (err) {
@@ -402,6 +408,7 @@ app.route("/connection/:id")
     .post((req, res) => {
         const id = req.params.id;
         const requestFrom = req.body.id;
+        //Remove the current user from the other user's pending requests
         User.findByIdAndUpdate(requestFrom, { $pull: { pendingRequests: id } }, { new: true },
             (err, user) => {
                 if (err) {
@@ -410,6 +417,7 @@ app.route("/connection/:id")
                     console.log("The other user was not found when removing you from their pending request");
                 } else {
                     console.log("You have been removed from their pending requests")
+                        //Add the current user to the other users's connections
                     User.findByIdAndUpdate(requestFrom, { $push: { connections: id } }, { new: true },
                         (err, user) => {
                             if (err) {
@@ -418,6 +426,7 @@ app.route("/connection/:id")
                                 console.log("Could not find other user to add connection to");
                             } else {
                                 console.log("You were added to the other user's connection");
+                                //Remove the other user from the current users' requests
                                 User.findByIdAndUpdate(id, { $pull: { requests: requestFrom } }, { new: true },
                                     (err, user) => {
                                         if (err) {
@@ -426,6 +435,7 @@ app.route("/connection/:id")
                                             console.log("Could not find your account");
                                         } else {
                                             console.log("The user was removed from your requests");
+                                            //Remove the other user from the current user's pending requests
                                             User.findByIdAndUpdate(id, { $pull: { pendingRequests: requestFrom } }, { new: true },
                                                 (err, user) => {
                                                     if (err) {
@@ -434,6 +444,7 @@ app.route("/connection/:id")
                                                         console.log("Could not find your account");
                                                     } else {
                                                         console.log("The user was removed from your pending requests");
+                                                        //Remove the current user from the other user's pending requests
                                                         User.findByIdAndUpdate(requestFrom, { $pull: { pendingRequests: id } }, { new: true },
                                                             (err, user) => {
                                                                 if (err) {
@@ -442,6 +453,7 @@ app.route("/connection/:id")
                                                                     console.log("Could not find your account");
                                                                 } else {
                                                                     console.log("You were removed from the user's pending requests");
+                                                                    //Add the connection request sender to the current user's connections
                                                                     User.findByIdAndUpdate(id, { $push: { connections: requestFrom } }, { new: true },
                                                                         (err, user) => {
                                                                             if (err) {
@@ -464,7 +476,33 @@ app.route("/connection/:id")
                 }
             });
     })
-    .delete()
+    .patch((req, res) => {
+        const id = req.params.id;
+        const toRemove = req.body.id;
+        //Remove the logged in user from the other user's connections
+        User.findByIdAndUpdate(toRemove, { $pull: { connections: id } }, { new: true }, (err, user) => {
+            if (err) {
+                console.log(err);
+            } else if (!user) {
+                console.log("The other user could not be found while deleting from connections");
+            } else {
+                console.log("You were removed from the other user's connections");
+                //Remove the other user from the logged in user's connections
+                User.findByIdAndUpdate(id, { $pull: { connections: toRemove } }, { new: true }, (err, user) => {
+                    if (err) {
+                        console.log(err);
+                    } else if (!user) {
+                        console.log("Could not find your account while deleting the other user from your connections");
+                    } else {
+                        console.log("The other user was removed from your connections");
+                        res.send({ user: user });
+                    }
+                })
+            }
+        })
+
+
+    });
 
 
 server.listen(port, () => {

@@ -23,6 +23,9 @@ export default function Info(props){
     //Keeps track on if you're connected to the user
     const [ connected, setConnected ] = useState(false);
 
+    //Keeps track on if the profile user sent a request
+    const [ requestSent, setRequestSent ] = useState(false);
+
 
     /*This gets the details of the user whose id matches the id of use params */
     useEffect(() => {
@@ -41,9 +44,18 @@ export default function Info(props){
                 if ((profile.connections.includes(props.user.user._id)) || 
                 (profile.requests.includes(props.user.user._id))) {
                     setReqDisabled(true);
+                } else {
+                    setReqDisabled(false);
                 }
                 if (profile.connections.includes(props.user.user._id)) {
                     setConnected(true);
+                } else {
+                    setConnected(false);
+                }
+                if (profile.pendingRequests.includes(props.user.user._id)){
+                    setRequestSent(true);
+                } else {
+                    setRequestSent(false);
                 }
                 })
             .catch(err => {
@@ -52,7 +64,7 @@ export default function Info(props){
         }
         getDetails();
         
-    }, [id, profile._id]);
+    }, [id, profile._id, props.user, connected, requestSent, reqDisabled]);
 
 
     /*Function to change the details of the user */
@@ -102,6 +114,31 @@ export default function Info(props){
         navigate(`/${request}/${profile._id}`);
     }
 
+    function acceptRequest(){
+        async function accept(){
+            axios.post(`${props.endpoint}connection/${props.user.user._id}`, {id: id})
+                .then(response => {
+                props.changeUser({...props.user, user: response.data.user})
+                setConnected(true);
+                })
+                .catch(err => console.log(err));
+        }
+        accept();
+    }
+
+    function removeConnection(){
+        async function remove(){
+            axios.patch(`${props.endpoint}connection/${props.user.user._id}`, {id: id})
+                .then(response => {
+                    props.changeUser({...props.user, user: response.data.user})
+                    setConnected(false);
+                    profile.connections.filter(connection => connection !== props.user.user._id);
+                })
+                .catch(err => console.log(err));
+        }
+        remove();
+    }
+
     return <div>
                     <h2>{profile.fullName}</h2>
                     <div className='info'>
@@ -136,8 +173,9 @@ export default function Info(props){
                                 <h6>{ props.user.user.pendingRequests.length }</h6>
                             </div> }
                             
-                            {!connected && props.user.auth &&  !isUser && <Button onClick={(sendRequest)} disabled={reqDisabled} type='primary'>{reqDisabled ? 'Request Sent' : 'Send Request'}</Button>}
-                            {connected && <Button variant='danger'>Remove from Connections</Button>}    
+                            {!requestSent && !connected && props.user.auth &&  !isUser && <Button type="button" onClick={sendRequest} disabled={reqDisabled} variant='primary'>{reqDisabled ? 'Request Sent' : 'Send Request'}</Button>}
+                            {!requestSent && connected && !isUser && props.user.auth && <Button type="button" onClick={removeConnection} variant='danger'>Remove from Connections</Button>}    
+                            {requestSent && !connected && props.user.auth &&  !isUser && <Button type="button" onClick={acceptRequest} variant='success'>Accept Request</Button>}
                         </div>  
 
                     </div>

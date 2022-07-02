@@ -70,6 +70,15 @@ export default function People(props){
                 })
                 .catch(err => console.log(err));
                 break
+            case "remove connection":
+                axios.patch(`${props.endpoint}connection/${props.user.user._id}`, {id: id})
+                .then(response => {
+                    props.setUser({...props.user, user: response.data.user})
+                    setPeople(people.filter(person => person._id !== id));
+                    navigate(`/profile/${props.user.user._id}`);
+                })
+                .catch(err => console.log(err));
+                break
             default:
                 //pass
                 break
@@ -93,7 +102,9 @@ export default function People(props){
                                     onClick={() => handleClick(person._id, 'decline request')}
                                     style={{margin: '0 10px'}} variant='danger'>Decline</Button>
                                  </div>}
-        {props.user.user._id === id && title === 'Connections' && <Button style={{margin: '0 10px'}} variant='danger'>Remove Connection</Button>}
+        {props.user.user._id === id && title === 'Connections' && <Button 
+                                                                    onClick={() => handleClick(person._id, 'remove connection')} 
+                                                                    style={{margin: '0 10px'}} variant='danger'>Remove Connection</Button>}
     </div> )}
     </div>
 }
