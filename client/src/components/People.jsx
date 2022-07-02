@@ -50,6 +50,14 @@ export default function People(props){
                 navigate(`/profile/${props.user.user._id}`);
             })
             .catch(err => console.log(err));
+        } else if (todo === 'decline request'){
+            axios.patch(`${props.endpoint}request/${props.user.user._id}`, {id: id})
+            .then(response => {
+                props.setUser({auth: true, user: response.data.user})
+                setPeople(people.filter((person) => person._id !== id));
+                navigate(`/profile/${props.user.user._id}`);
+            })
+            .catch(err => console.log(err));
         }
     }
 
@@ -62,8 +70,12 @@ export default function People(props){
          onClick={() => handleClick(person._id, 'cancel sent request')} 
          style={{margin: '0 10px'}} variant='danger'>Cancel Request</Button>}
         {title === 'Requests' && <div>
-                                    <Button style={{margin: '0 10px'}} variant='success'>Accept</Button>
-                                    <Button style={{margin: '0 10px'}} variant='danger'>Decline</Button>
+                                    <Button 
+                                    onClick={() => handleClick(person._id, 'accept request')}
+                                    style={{margin: '0 10px'}} variant='success'>Accept</Button>
+                                    <Button 
+                                    onClick={() => handleClick(person._id, 'decline request')}
+                                    style={{margin: '0 10px'}} variant='danger'>Decline</Button>
                                  </div>}
         {title === 'Connections' && <Button style={{margin: '0 10px'}} variant='danger'>Remove Connection</Button>}
     </div> )}

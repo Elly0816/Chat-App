@@ -322,10 +322,30 @@ app.route("/request/:id")
             });
 
     })
-    .delete((req, res) => {
+    .patch((req, res) => {
         const id = req.params.id;
         const requestFrom = req.body.id;
-        User.findOneAndUpdate()
+        User.findOneAndUpdate(requestFrom, { $pull: { pendingRequests: id } }, { new: true },
+            (err, user) => {
+                if (err) {
+                    console.log(err);
+                } else if (!user) {
+                    console.log("The user the request was sent from was not found");
+                } else {
+                    console.log("You were removed from their pending requests");
+                    User.findByIdAndUpdate(id, { $pull: { requests: requestFrom } }, { new: true },
+                        (err, user) => {
+                            if (err) {
+                                console.log(err);
+                            } else if (!user) {
+                                console.log("The user to remove the request from was not found");
+                            } else {
+                                console.log("You have declined the connection request");
+                                res.send({ user: user });
+                            }
+                        });
+                }
+            });
     });
 
 /*Route to handle pending requests by deleting them */

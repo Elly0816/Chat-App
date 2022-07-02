@@ -113,7 +113,7 @@ export default function Info(props){
                     </div>
                         
                         <div className='info-2'>
-                            { profile.connections && <div>
+                            { profile.connections && <div onClick={ () => getRequests('connection')}>
                                 <span>Connections:</span>
                                 <h6>{ profile.connections.length }</h6>
                             </div> }
