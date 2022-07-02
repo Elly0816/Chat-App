@@ -42,22 +42,38 @@ export default function People(props){
     }, [id, request, props.user, props.endpoint]);
 
     function handleClick(id, todo){
-        if (todo === 'cancel sent request'){
-            axios.patch(`${props.endpoint}pending-requests/${props.user.user._id}`, {id: id})
-            .then(response => {
-                props.setUser({auth: true, user: response.data.user})
+        switch (todo) {
+            case "cancel sent request" :
+                axios.patch(`${props.endpoint}pending-requests/${props.user.user._id}`, {id: id})
+                .then(response => {
+                props.setUser({...props.user, user: response.data.user})
                 setPeople(people.filter((person) => person._id !== id));
                 navigate(`/profile/${props.user.user._id}`);
-            })
-            .catch(err => console.log(err));
-        } else if (todo === 'decline request'){
-            axios.patch(`${props.endpoint}request/${props.user.user._id}`, {id: id})
-            .then(response => {
-                props.setUser({auth: true, user: response.data.user})
+                })
+                .catch(err => console.log(err));
+                break
+            case "decline request":
+                axios.patch(`${props.endpoint}request/${props.user.user._id}`, {id: id})
+                .then(response => {
+                props.setUser({...props.user, user: response.data.user})
                 setPeople(people.filter((person) => person._id !== id));
                 navigate(`/profile/${props.user.user._id}`);
-            })
-            .catch(err => console.log(err));
+                })
+                .catch(err => console.log(err));
+                break
+            case "accept request":
+                axios.post(`${props.endpoint}connection/${props.user.user._id}`, {id: id})
+                .then(response => {
+                props.setUser({...props.user, user: response.data.user})
+                setPeople(people.filter((person) => person._id !== id));
+                navigate(`/profile/${props.user.user._id}`);
+                })
+                .catch(err => console.log(err));
+                break
+            default:
+                //pass
+                break
+                
         }
     }
 
@@ -77,7 +93,7 @@ export default function People(props){
                                     onClick={() => handleClick(person._id, 'decline request')}
                                     style={{margin: '0 10px'}} variant='danger'>Decline</Button>
                                  </div>}
-        {title === 'Connections' && <Button style={{margin: '0 10px'}} variant='danger'>Remove Connection</Button>}
+        {props.user.user._id === id && title === 'Connections' && <Button style={{margin: '0 10px'}} variant='danger'>Remove Connection</Button>}
     </div> )}
     </div>
 }
