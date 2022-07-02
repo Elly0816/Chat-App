@@ -218,6 +218,14 @@ app.post('/login', (req, res) => {
 
 
 /*Logout route */
+app.post('/logout', (req, res) => {
+    req.logout((err) => {
+        if (err) {
+            console.log(err);
+        }
+    });
+    res.send({ response: "logged out" });
+});
 
 
 

@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Search from './Search';
 import { Search as SearchIcon } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 
 
@@ -11,9 +12,16 @@ export default function Header(props) {
     const navigate = useNavigate();
 
     function logout(){
-        props.logout(false);
-        localStorage.clear();
-        navigate("/login");
+        async function out(){
+            await axios.post(`${props.endpoint}logout`)
+            .then(response => {
+                props.logout(false);
+                localStorage.clear();
+                navigate("/login");
+            })
+            .catch(err => console.log(err));
+        }
+        out();     
     }
 
     const [ openSearch, setOpenSearch ] = useState(false);

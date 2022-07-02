@@ -64,7 +64,7 @@ export default function Info(props){
         }
         getDetails();
         
-    }, [id, profile._id, props.user, connected, requestSent, reqDisabled]);
+    }, [id, profile._id]);
 
 
     /*Function to change the details of the user */
