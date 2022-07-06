@@ -2,9 +2,8 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/Header';
 import React, { useState, useRef, useEffect } from 'react';
-import Messages from './components/Messages';
+import Home from './components/Home';
 import  io from 'socket.io-client';
-import Entry from './components/Entry';
 import Login from './components/Login';
 import Info from './components/Info';
 import People from './components/People';
@@ -95,15 +94,7 @@ function App() {
           <Route path="/login" element={ 
             !user.auth ? <Login endpoint={ endpoint }
                                 authenticate={ authenticate }/> : <Navigate to="/" /> } />
-          <Route path="/" element={ 
-            user.auth ? <div> 
-                                <div className='message-container' ref={ messageContainer }>
-                                  {messages.map((message, index) => <Messages 
-                                  key={message+index} 
-                                  message={message}/>)}
-                                </div> 
-                                <Entry sendMessage={sendMessage}/> 
-                              </div> : <Navigate to="/login" /> }/>
+          <Route path="/" element={ user.auth ? <Home sendMessage={ sendMessage } user={ user.user }/> : <Navigate to="/login" /> }/>
           {user.auth && <Route path="/:request/:id" element={ <People setUser={ setUser } user={ user } endpoint={ endpoint }/> } />}
         </Routes>
       </Router>
