@@ -217,6 +217,21 @@ app.post('/login', (req, res) => {
 });
 
 
+// Get current user details
+app.get('/:id', (req, res) => {
+    const id = req.params.id;
+    User.findById(id, (err, user) => {
+        if (err) {
+            console.log("There was an error with the database");
+        } else if (!user) {
+            console.log("There was no user found in the database");
+        } else {
+            res.send({ user: user });
+        }
+    })
+});
+
+
 /*Logout route */
 app.post('/logout', (req, res) => {
     req.logout((err) => {

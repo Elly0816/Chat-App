@@ -4,6 +4,7 @@ import Header from './components/Header';
 import React, { useState, useRef, useEffect } from 'react';
 import Home from './components/Home';
 import  io from 'socket.io-client';
+import axios from 'axios';
 import Login from './components/Login';
 import Info from './components/Info';
 import People from './components/People';
@@ -28,8 +29,16 @@ function App() {
     const loggedInUser = localStorage.getItem('user');
     // console.log(JSON.stringify(loggedInUser));
     if (loggedInUser){
-      const foundUser = JSON.parse(loggedInUser);
-      setUser({auth: true, user: foundUser});
+      setUser({auth: true, user: {}});
+      async function getUser(){
+        const userInStorage = JSON.parse(loggedInUser);
+        await axios.get(`${endpoint}${userInStorage._id}`)
+        .then(response => {
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+          setUser({auth: true, user: response.data.user});
+        })
+      }
+      getUser();
     }}, []);
 
 
@@ -60,17 +69,6 @@ function App() {
   }
 
 
-/*Enables auto focus on the bottom of the messages div */
-  const messageContainer = useRef(null);
-
-  useEffect (() => {
-    const msgs = messageContainer.current;
-    if (msgs){
-      msgs.scrollTop = msgs.scrollHeight;
-    }
-  }, [messages]);
-
-
   function authenticate(status){
    setUser(status);
   }
@@ -94,7 +92,7 @@ function App() {
           <Route path="/login" element={ 
             !user.auth ? <Login endpoint={ endpoint }
                                 authenticate={ authenticate }/> : <Navigate to="/" /> } />
-          <Route path="/" element={ user.auth ? <Home sendMessage={ sendMessage } user={ user.user }/> : <Navigate to="/login" /> }/>
+          <Route path="/" element={ user.auth ? <Home messages={ messages } sendMessage={ sendMessage } user={ user.user }/> : <Navigate to="/login" /> }/>
           {user.auth && <Route path="/:request/:id" element={ <People setUser={ setUser } user={ user } endpoint={ endpoint }/> } />}
         </Routes>
       </Router>

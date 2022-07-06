@@ -63,12 +63,16 @@ h6 {
     overflow-y: scroll;
 }
 
-.message {
-    display: block;
+.entry {
+    display: flex;
 }
 
-.message .button {
-    float: right;
+.entry-form {
+    width: 85%;
+}
+
+.entry .button {
+    width: 15%;
 }
 
 .home {
@@ -86,6 +90,7 @@ h6 {
     padding-left: 1em;
     margin: 0.25em 0;
     border-radius: 30px 30px 30px 0;
+    width: 50%;
 }
 
 .info {
