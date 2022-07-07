@@ -52,7 +52,7 @@ const messageSchema = new mongoose.Schema({
 /*Schema for chats*/
 const chatSchema = new mongoose.Schema({
     between: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    messages: [messageSchema]
+    messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }]
 });
 
 /*User Schema */
@@ -64,7 +64,7 @@ const userSchema = new mongoose.Schema({
     email: String,
     password: String,
     connections: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    chats: [chatSchema],
+    chats: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chat' }],
     pendingRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     requests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
@@ -526,6 +526,77 @@ app.route("/connection/:id")
 
 
     });
+
+//Create chat between current user and requested connected user
+app.route('/chat/:user/:other')
+    .get((req, res) => {
+        const userId = req.params.user;
+        const otherId = req.params.other;
+        //Check if the other user is in the connections of the current user
+        User.findById(userId, 'connections', (err, user) => {
+            if (err) {
+                console.log(err);
+            } else if (!user) {
+                console.log("The current user was not found while checking if connections exists");
+            } else {
+                console.log(user);
+                const connections = user.connections;
+                if (connections.includes(mongoose.Types.ObjectId(otherId))) {
+                    // Find the chat between the current user and the other user
+                    Chat.findOne({
+                        between: {
+                            $all: [mongoose.Types.ObjectId(userId),
+                                mongoose.Types.ObjectId(otherId)
+                            ]
+                        }
+                    }, (err, chat) => {
+                        if (err) {
+                            console.log("There was an error with the database");
+                        } else if (!chat) {
+                            //If the chat was not found, create it and add it to both users chat field
+                            Chat.create({ between: [userId, otherId] }, (err, chat) => {
+                                if (err) {
+                                    console.log("There was an error with the database while creating the chat");
+                                } else {
+                                    console.log("The chat was created");
+                                    //Add the chat to the current user's document
+                                    User.findByIdAndUpdate(otherId, { $push: { chats: chat._id } }, { new: true },
+                                        (err, otherUser) => {
+                                            if (err) {
+                                                console.log(err);
+                                            } else if (!otherUser) {
+                                                console.log("The current user could not be found");
+                                            } else {
+                                                console.log("The chat was added to the other user's document");
+                                                //Add the chat to the other user's document
+                                                User.findByIdAndUpdate(userId, { $push: { chats: chat._id } }, { new: true },
+                                                    (err, currentUser) => {
+                                                        if (err) {
+                                                            console.log(err);
+                                                        } else if (!currentUser) {
+                                                            console.log("The other user could not be found");
+                                                        } else {
+                                                            console.log("The chat was added to the current user's document");
+                                                            res.send({ chat: chat });
+                                                        }
+                                                    })
+                                            }
+                                        })
+                                }
+                            });
+                        } else {
+                            //Send the chat to the client if it was found
+                            console.log("The chat was found");
+                            res.send({ chat: chat });
+                        }
+                    })
+                } else {
+
+                }
+            }
+        })
+
+    })
 
 
 server.listen(port, () => {

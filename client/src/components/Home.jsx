@@ -13,7 +13,8 @@ export default function Home(props){
 
     return <div className='home'>
             <div className='chats'>
-                { props.user.connections.map(connection =>  <div> <h5>{connection}</h5></div> )}
+                { props.user.connections?.map(connection =>  <div key={connection}> <p>{connection}</p></div> )}
+                {/* <p>{props.user.connections}, {typeof(props.user.connections)}</p> */}
             </div>
             <div className='message-container-container'>
                 <div className='message-container' ref={messageContainer}>
@@ -25,6 +26,5 @@ export default function Home(props){
                 </div>
                 <Entry sendMessage={ props.sendMessage }/>
             </div>
-            
     </div>
 }

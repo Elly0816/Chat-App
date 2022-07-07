@@ -102,9 +102,15 @@ export default function People(props){
                                     onClick={() => handleClick(person._id, 'decline request')}
                                     style={{margin: '0 10px'}} variant='danger'>Decline</Button>
                                  </div>}
-        {props.user.user._id === id && title === 'Connections' && <Button 
+        {props.user.user._id === id && title === 'Connections' && <div>
+                                                                    <Button 
                                                                     onClick={() => handleClick(person._id, 'remove connection')} 
-                                                                    style={{margin: '0 10px'}} variant='danger'>Remove Connection</Button>}
+                                                                    style={{margin: '0 10px'}} variant='danger'>Remove Connection
+                                                                    </Button>
+                                                                    <Button
+                                                                    style={{margin: '0 10px'}} variant='primary'>Chat
+                                                                    </Button>
+                                                                 </div>}
     </div> )}
     </div>
 }
