@@ -29,7 +29,7 @@ function App() {
     const loggedInUser = localStorage.getItem('user');
     // console.log(JSON.stringify(loggedInUser));
     if (loggedInUser){
-      setUser({auth: true, user: {}});
+      setUser({auth: true, user: {_id: JSON.parse(loggedInUser)._id}});
       async function getUser(){
         const userInStorage = JSON.parse(loggedInUser);
         await axios.get(`${endpoint}${userInStorage._id}`)
@@ -92,7 +92,7 @@ function App() {
           <Route path="/login" element={ 
             !user.auth ? <Login endpoint={ endpoint }
                                 authenticate={ authenticate }/> : <Navigate to="/" /> } />
-          <Route path="/" element={ user.auth ? <Home messages={ messages } sendMessage={ sendMessage } user={ user.user }/> : <Navigate to="/login" /> }/>
+          <Route path="/" element={ user.auth ? <Home endpoint={ endpoint } messages={ messages } sendMessage={ sendMessage } user={ user.user }/> : <Navigate to="/login" /> }/>
           {user.auth && <Route path="/:request/:id" element={ <People setUser={ setUser } user={ user } endpoint={ endpoint }/> } />}
         </Routes>
       </Router>

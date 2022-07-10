@@ -528,12 +528,44 @@ app.route("/connection/:id")
     });
 
 //Create chat between current user and requested connected user
-app.route('/chat/:user/:other')
+app.route('/chats/:user')
     .get((req, res) => {
         const userId = req.params.user;
-        const otherId = req.params.other;
+        User.findById(userId, 'chats', (err, user) => {
+            if (err) {
+                console.log(err);
+            } else if (!user) {
+                console.log("The user does not exist");
+            } else {
+                const chats = user.chats.map(chat => chat.toString());
+                Chat.find({ '_id': { $in: chats } }, (err, chats) => {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        const otherUsers = chats.map(chat => chat.between.filter(id => id.toString() !== userId)).map(id => id.toString());
+                        console.log(otherUsers);
+                        User.find({ '_id': { $in: otherUsers } }, 'fullName', (err, users) => {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                res.send({ chats: chats, otherUsers: users });
+                            }
+                        });
+
+                    }
+                })
+            }
+        });
+
+    })
+
+
+app.route('/chat/:user/:other')
+    .get((req, res) => {
         //Check if the other user is in the connections of the current user
-        User.findById(userId, 'connections', (err, user) => {
+        const userId = req.params.user;
+        const otherId = req.params.other
+        User.findById(userId, (err, user) => {
             if (err) {
                 console.log(err);
             } else if (!user) {
@@ -577,7 +609,27 @@ app.route('/chat/:user/:other')
                                                             console.log("The other user could not be found");
                                                         } else {
                                                             console.log("The chat was added to the current user's document");
-                                                            res.send({ chat: chat });
+                                                            // res.send({ chat: chat });
+                                                            //Return the chats of the current user and the name and id of the other users in the chat
+                                                            const chats = currentUser.chats.map(chat => chat.toString());
+                                                            Chat.find({ _id: { $in: chats } }, (err, chats) => {
+                                                                if (err) {
+                                                                    console.log(err);
+                                                                } else {
+                                                                    const otheruserIds = chats.map(chat => chat.between.filter(id => id.toString() !== userId)).map(id => id.toString());
+                                                                    // let otheruserIds = between;
+                                                                    // otheruserIds = otheruserIds.filter(id => id !== userId);
+                                                                    console.log(`other user id ${otheruserIds}, user id: ${userId}`);
+                                                                    User.find({ '_id': { $in: otheruserIds } }, ['_id', 'fullName'], (err, users) => {
+                                                                        if (err) {
+                                                                            console.log(err);
+                                                                        } else {
+                                                                            res.send({ chats: chats, otherUsers: users });
+                                                                        }
+                                                                    })
+
+                                                                }
+                                                            })
                                                         }
                                                     })
                                             }
@@ -585,19 +637,37 @@ app.route('/chat/:user/:other')
                                 }
                             });
                         } else {
-                            //Send the chat to the client if it was found
+                            //Send the chat and the corresponding user to the client if it was found
                             console.log("The chat was found");
-                            res.send({ chat: chat });
+                            const chatIds = user.chats.map(chat => chat._id.toString());
+                            // const chats = user.chats;
+                            Chat.find({ _id: { $in: chatIds } }, (err, chats) => {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    const otheruserIds = chats.map(chat => chat.between.filter(id => id.toString() !== userId)).map(id => id.toString());
+                                    // let otheruserIds = between;
+                                    // otheruserIds = otheruserIds.filter(id => id !== userId);
+                                    console.log(`other user id ${otheruserIds}, user id: ${userId}`);
+                                    User.find({ '_id': { $in: otheruserIds } }, ['_id', 'fullName'], (err, users) => {
+                                        if (err) {
+                                            console.log(err);
+                                        } else {
+                                            res.send({ chats: chats, otherUsers: users });
+                                        }
+                                    })
+
+                                }
+                            })
                         }
                     })
                 } else {
-
+                    //You are not connected to the user 
                 }
             }
         })
 
     })
-
 
 server.listen(port, () => {
     console.log(`Server up and running at ${port}`);
