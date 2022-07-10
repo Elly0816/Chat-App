@@ -669,6 +669,18 @@ app.route('/chat/:user/:other')
 
     })
 
+
+
+//This gets the messages from a certain chat
+app.route('/messages/:id')
+    .get((req, res) => {
+        const chatId = req.params.id;
+        Chat.findById(chatId, (err, chat) => {
+            console.log(chat);
+            res.send({ chat: chat });
+        })
+    })
+
 server.listen(port, () => {
     console.log(`Server up and running at ${port}`);
 });
