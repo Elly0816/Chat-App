@@ -59,13 +59,9 @@ function App() {
 
   /*Handles the sending of messages through the socket */
   if (socket){
-    sendMessage = (message) => {
-      socket.emit('send', message);
+    sendMessage = (toSend) => {
+      socket.emit('send',toSend);
     }
-  
-    socket.on('send', (arg) => {
-      setMessages([...messages, arg])
-    })
   }
 
 
@@ -92,7 +88,11 @@ function App() {
           <Route path="/login" element={ 
             !user.auth ? <Login endpoint={ endpoint }
                                 authenticate={ authenticate }/> : <Navigate to="/" /> } />
-          <Route path="/" element={ user.auth ? <Home endpoint={ endpoint } messages={ messages } sendMessage={ sendMessage } user={ user.user }/> : <Navigate to="/login" /> }/>
+          <Route path="/" element={ user.auth ? <Home 
+                                                  endpoint={ endpoint } 
+                                                  socket={ socket } 
+                                                  sendMessage={ sendMessage } 
+                                                  user={ user.user }/> : <Navigate to="/login" /> }/>
           {user.auth && <Route path="/:request/:id" element={ <People setUser={ setUser } user={ user } endpoint={ endpoint }/> } />}
         </Routes>
       </Router>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Entry from './Entry';
 import axios from 'axios';
 import Messages from './Messages';
@@ -10,6 +10,7 @@ export default function Home(props){
 
     const [ items, setItems ] = useState();
     const [ messages, setMessages ] = useState();
+    const [ currentChatId, setCurrentChatId ] = useState();
 
     
 
@@ -29,22 +30,42 @@ export default function Home(props){
         getChats()
     }, [])
 
+
+    //Socket passed down from app
+    if(props.socket){
+        props.socket.on('receive', (arg) => {
+            console.log(arg);
+            setMessages(arg);
+            // setMessages([...messages, arg])
+          })
+    }
+
+
+    //This initally loads up the messages chat from the database
     function getMessages(id, otherUserId) {
         axios.get(`${props.endpoint}messages/${id}`)
         .then(response => {
-            if (!response.data.message){
-                setMessages([`Start a chat with ${otherUserId}`])
+            if (!response.data.messages){
+                console.log(response.data);
+                setMessages([{text: `Start a chat with ${otherUserId}`}]);
             } else {
-                setMessages(response.data.messages)
+                console.log(response.data.messages)
+                setMessages(response.data.messages);
             }
         })
         .catch(err => console.log(err));
     }
 
+    //This sets the id of the chat to load messages from in the Entry component
+    function setId(id){
+        setCurrentChatId(id);
+    }
+
     return <div className='home'>
-                    <Chats getMessages={getMessages} items={items}/>
+                    <Chats setId={setId} getMessages={getMessages} items={items}/>
                     {!messages ? <h5>Your chats are on the left. Click on one to view the messages.</h5> 
-                    : <div className='message-container-container'><Messages messages={messages}/><Entry sendMessage={ props.sendMessage }/>
+                    : <div className='message-container-container'><Messages messages={messages}/>
+                        <Entry chatId={currentChatId} sendMessage={ props.sendMessage } userId={props.user._id}/>
             </div>}            
     </div>
 }

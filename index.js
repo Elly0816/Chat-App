@@ -44,8 +44,7 @@ const port = 5000;
 
 const messageSchema = new mongoose.Schema({
     text: String,
-    sender: String,
-    receiver: String,
+    sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     time: { type: Date, default: Date.now }
 });
 
@@ -101,8 +100,30 @@ io.on('connection', (socket) => {
 
     /*This sends a message to the user currently being chatted with */
     socket.on('send', (arg) => {
-        console.log(arg);
-        socket.emit('send', arg);
+        const message = arg.message;
+        const chatId = arg.chatId;
+        const senderId = arg.senderId;
+        Message.create({ text: message, sender: senderId }, (err, message) => {
+            if (err) {
+                console.log(err);
+            } else {
+                Chat.findByIdAndUpdate(chatId, { $push: { messages: message._id } }, { new: true }, (err, chat) => {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        const messageIds = chat.messages.map(message => message.toString());
+                        Message.find({ '_id': { $in: messageIds } }, (err, msgs) => {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                // msgs = msgs.sort({ time: 1 });
+                                socket.emit('receive', msgs);
+                            }
+                        })
+                    }
+                })
+            }
+        });
     });
 
 
