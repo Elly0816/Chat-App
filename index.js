@@ -626,14 +626,14 @@ app.route('/chat/:user/:other')
                                                                         } else {
                                                                             res.send({ chats: chats, otherUsers: users });
                                                                         }
-                                                                    })
+                                                                    });
 
                                                                 }
-                                                            })
+                                                            });
                                                         }
-                                                    })
+                                                    });
                                             }
-                                        })
+                                        });
                                 }
                             });
                         } else {
@@ -655,19 +655,19 @@ app.route('/chat/:user/:other')
                                         } else {
                                             res.send({ chats: chats, otherUsers: users });
                                         }
-                                    })
+                                    });
 
                                 }
-                            })
+                            });
                         }
-                    })
+                    });
                 } else {
                     //You are not connected to the user 
                 }
             }
-        })
+        });
 
-    })
+    });
 
 
 
@@ -676,10 +676,25 @@ app.route('/messages/:id')
     .get((req, res) => {
         const chatId = req.params.id;
         Chat.findById(chatId, (err, chat) => {
-            console.log(chat);
-            res.send({ chat: chat });
-        })
-    })
+            if (err) {
+                console.log(err);
+            } else if (!chat) {
+                console.log("There was no chat found");
+            } else {
+                const messages = chat.messages.map(message => message.toString());
+                Message.find({ '_id': { $in: messages } }, (err, messages) => {
+                    if (err) {
+                        console.log(err);
+                    } else if (!messages) {
+                        console.log("There were no messages found");
+                    } else {
+                        console.log(messages);
+                        res.send({ messages: messages });
+                    }
+                });
+            }
+        });
+    });
 
 server.listen(port, () => {
     console.log(`Server up and running at ${port}`);
