@@ -45,10 +45,12 @@ function App() {
     if ( user.auth ){
       if (!socket){
         setSocket(io.connect(endpoint));
+        //Emit an event to add the socket id to the user's socket field
       }
       
-    }else {
+    } else {
       if (socket){
+        //Emit an event to remove the socket id from the current user's socket field 
         socket.disconnect(true, user.user._id);
         setSocket();
       }

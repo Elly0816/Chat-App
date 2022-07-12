@@ -93,11 +93,14 @@ passport.deserializeUser(User.deserializeUser());
 
 io.on('connection', (socket) => {
     console.log(`user ${socket.id} connected to the server`);
-    socket.on("disconnect", (arg) => {
+    socket.on("disconnect", () => {
         console.log(`user ${socket.id} disconnected from the server`);
-        console.log(arg);
+
     });
 
+    //Listen to when the event to add the socket id to the user's socket field is fired
+
+    //Listen to when the event to remove the socket id from the user's socket field is fired
 
     /*This sends a message to the user currently being chatted with */
     socket.on('send', (arg) => {
