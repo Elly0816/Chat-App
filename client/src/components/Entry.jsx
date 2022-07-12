@@ -14,7 +14,10 @@ export default function Entry(props){
 
     function handleSubmit(e){
         e.preventDefault();
-        props.sendMessage({message: message, chatId: props.chatId, senderId: props.userId});
+        props.sendMessage({message: message,
+             chatId: props.chatId,
+             senderId: props.userId,
+            otherUserId: props.otherUserId});
         setMessage("");
 
     }

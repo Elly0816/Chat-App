@@ -1,7 +1,7 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/Header';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Home from './components/Home';
 import  io from 'socket.io-client';
 import axios from 'axios';
@@ -18,8 +18,6 @@ function App() {
   const endpoint = 'http://localhost:5000/';
 
   const [ socket, setSocket ] = useState();
-
-  const [ messages, setMessages ] = useState([]);
 
   const [ user, setUser ] = useState({auth: null, user: {}});
 
@@ -46,12 +44,12 @@ function App() {
   useEffect(() => {
     if ( user.auth ){
       if (!socket){
-        setSocket(io.connect("http://localhost:5000"));
+        setSocket(io.connect(endpoint));
       }
       
     }else {
       if (socket){
-        socket.disconnect(true);
+        socket.disconnect(true, user.user._id);
         setSocket();
       }
     }

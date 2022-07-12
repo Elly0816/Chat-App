@@ -9,7 +9,8 @@ export default function Chats(props){
     { props.items?.map((item) =>  
     <div onClick={
                     () => {props.getMessages(item[1]._id, item[0].fullName);
-                            props.setId(item[1]._id)
+                            props.setId(item[1]._id);
+                            props.setUserId(item[0]._id)
                             }
                          } 
                          className='chat-tile' 

@@ -65,7 +65,8 @@ const userSchema = new mongoose.Schema({
     connections: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     chats: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chat' }],
     pendingRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    requests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    requests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    socketId: String
 });
 
 /*Add passport local mongoose to the user schema */
@@ -92,9 +93,9 @@ passport.deserializeUser(User.deserializeUser());
 
 io.on('connection', (socket) => {
     console.log(`user ${socket.id} connected to the server`);
-
-    socket.on("disconnect", () => {
+    socket.on("disconnect", (arg) => {
         console.log(`user ${socket.id} disconnected from the server`);
+        console.log(arg);
     });
 
 
@@ -103,6 +104,7 @@ io.on('connection', (socket) => {
         const message = arg.message;
         const chatId = arg.chatId;
         const senderId = arg.senderId;
+        const otherUserId = arg.otherUserId;
         Message.create({ text: message, sender: senderId }, (err, message) => {
             if (err) {
                 console.log(err);
@@ -116,7 +118,8 @@ io.on('connection', (socket) => {
                             if (err) {
                                 console.log(err);
                             } else {
-                                // msgs = msgs.sort({ time: 1 });
+                                //Find the current user and set the socket id to the current on if it is not already that
+                                User.findByIdAndUpdate(senderId, { $set: { socket: socket.id } })
                                 socket.emit('receive', msgs);
                             }
                         })

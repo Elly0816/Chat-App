@@ -11,6 +11,8 @@ export default function Home(props){
     const [ items, setItems ] = useState();
     const [ messages, setMessages ] = useState();
     const [ currentChatId, setCurrentChatId ] = useState();
+    
+    const [ otherUserId, setOtherUserId ] = useState();
 
     
 
@@ -31,6 +33,11 @@ export default function Home(props){
     }, [])
 
 
+    //Function to set the other user's id for socket identification
+    function setUserId(id){
+        setOtherUserId(id);
+    }
+
     //Socket passed down from app
     if(props.socket){
         props.socket.on('receive', (arg) => {
@@ -42,12 +49,12 @@ export default function Home(props){
 
 
     //This initally loads up the messages chat from the database
-    function getMessages(id, otherUserId) {
+    function getMessages(id, otherUserName) {
         axios.get(`${props.endpoint}messages/${id}`)
         .then(response => {
             if (!response.data.messages){
                 console.log(response.data);
-                setMessages([{text: `Start a chat with ${otherUserId}`}]);
+                setMessages([{text: `Start a chat with ${otherUserName}`}]);
             } else {
                 console.log(response.data.messages)
                 setMessages(response.data.messages);
@@ -62,10 +69,10 @@ export default function Home(props){
     }
 
     return <div className='home'>
-                    <Chats setId={setId} getMessages={getMessages} items={items}/>
+                    <Chats setUserId={setUserId} setId={setId} getMessages={getMessages} items={items}/>
                     {!messages ? <h5>Your chats are on the left. Click on one to view the messages.</h5> 
-                    : <div className='message-container-container'><Messages messages={messages}/>
-                        <Entry chatId={currentChatId} sendMessage={ props.sendMessage } userId={props.user._id}/>
+                    : <div className='message-container-container'><Messages userId={props.user._id} messages={messages}/>
+                        <Entry otherUserId={otherUserId} chatId={currentChatId} sendMessage={ props.sendMessage } userId={props.user._id}/>
             </div>}            
     </div>
 }
