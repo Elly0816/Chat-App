@@ -41,22 +41,7 @@ export default function Info(props){
                 } else {
                     setIsUser(false);
                 }
-                if ((profile.connections.includes(props.user.user._id)) || 
-                (profile.requests.includes(props.user.user._id))) {
-                    setReqDisabled(true);
-                } else {
-                    setReqDisabled(false);
-                }
-                if (profile.connections.includes(props.user.user._id)) {
-                    setConnected(true);
-                } else {
-                    setConnected(false);
-                }
-                if (profile.pendingRequests.includes(props.user.user._id)){
-                    setRequestSent(true);
-                } else {
-                    setRequestSent(false);
-                }
+                
                 })
             .catch(err => {
                 console.log(err);
@@ -67,12 +52,36 @@ export default function Info(props){
     }, [id, profile._id]);
 
 
+    //useEffect to change buttons that show on the page
+    useEffect(() => {
+        if(profile._id){
+            if ((profile.connections.includes(props.user.user._id)) || 
+            (profile.requests.includes(props.user.user._id))) {
+            setReqDisabled(true);
+            } else {
+                setReqDisabled(false);
+            }
+            if (profile.connections.includes(props.user.user._id)) {
+                setConnected(true);
+            } else {
+                setConnected(false);
+            }
+            if (profile.pendingRequests.includes(props.user.user._id)){
+                setRequestSent(true);
+            } else {
+                setRequestSent(false);
+            }
+        }
+        
+    } ,[profile._id]);
+
+
     /*Function to change the details of the user */
     function handleSubmit(e){
         console.log('submit clicked');
         e.preventDefault();
-        async function changeDetails(){
-            await axios.patch(`${props.endpoint}profile/${id}`, {
+        function changeDetails(){
+            axios.patch(`${props.endpoint}profile/${id}`, {
                 firstName: profile.firstName,
                 lastName: profile.lastName,
                 fullName: `${profile.firstName} ${profile.lastName}`,
