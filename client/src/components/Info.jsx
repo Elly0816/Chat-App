@@ -138,6 +138,15 @@ export default function Info(props){
         }
         remove();
     }
+    
+    //Creates or returns chat between two users
+    function createChat(){
+        axios.get(`${props.endpoint}chat/${props.user.user._id}/${profile._id}`)
+        .then(response => {
+            console.log(response);
+            navigate("/");
+        })
+    }
 
     return <div>
                     <h2>{profile.fullName}</h2>
@@ -174,7 +183,10 @@ export default function Info(props){
                             </div> }
                             
                             {!requestSent && !connected && props.user.auth &&  !isUser && <Button type="button" onClick={sendRequest} disabled={reqDisabled} variant='primary'>{reqDisabled ? 'Request Sent' : 'Send Request'}</Button>}
-                            {!requestSent && connected && !isUser && props.user.auth && <Button type="button" onClick={removeConnection} variant='danger'>Remove from Connections</Button>}    
+                            {!requestSent && connected && !isUser && props.user.auth && <div>
+                                                                                            <Button style={{margin:"0.2em"}} type="button" onClick={removeConnection} variant='danger'>Remove from Connections</Button>
+                                                                                            <Button style={{margin:"0.2em"}} type="button" onClick={createChat} variant='primary'>Chat</Button>
+                                                                                        </div>}    
                             {requestSent && !connected && props.user.auth &&  !isUser && <Button type="button" onClick={acceptRequest} variant='success'>Accept Request</Button>}
                         </div>  
 

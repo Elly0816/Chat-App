@@ -82,6 +82,8 @@ h6 {
 .chats {
     width: 25%;
     font-size: 0.8em;
+    height: 40.5em;
+    overflow-y: scroll;
 }
 
 .my-messages {
@@ -122,4 +124,5 @@ h6 {
 
 .chat-tile {
     background-color: beige;
+    border-width: 2px;
 }

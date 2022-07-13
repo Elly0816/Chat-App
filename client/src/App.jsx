@@ -21,19 +21,25 @@ function App() {
 
   const [ user, setUser ] = useState({auth: null, user: {}});
 
+
   
   /*This checks if a user has previously logged in */
   useEffect(() => {
     const loggedInUser = localStorage.getItem('user');
     // console.log(JSON.stringify(loggedInUser));
     if (loggedInUser){
-      setUser({auth: true, user: {_id: JSON.parse(loggedInUser)._id}});
-      async function getUser(){
+      // setUser({auth: true, user: {_id: JSON.parse(loggedInUser)._id}});
+      function getUser(){
         const userInStorage = JSON.parse(loggedInUser);
-        await axios.get(`${endpoint}${userInStorage._id}`)
+        axios.get(`${endpoint}${userInStorage._id}`)
         .then(response => {
-          localStorage.setItem('user', JSON.stringify(response.data.user));
-          setUser({auth: true, user: response.data.user});
+          if (response.data.user){
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+            setUser({auth: true, user: response.data.user});
+          } else {
+            setUser({auth: false});
+          }
+          
         })
       }
       getUser();
@@ -45,17 +51,20 @@ function App() {
     if ( user.auth ){
       if (!socket){
         setSocket(io.connect(endpoint));
-        //Emit an event to add the socket id to the user's socket field
-      }
-      
-    } else {
-      if (socket){
-        //Emit an event to remove the socket id from the current user's socket field 
-        socket.disconnect(true, user.user._id);
-        setSocket();
       }
     }
   }, [user]);
+
+
+
+  //This handles the sending of the socket id and the user id to the server
+  useEffect(()=>{
+    if(socket){
+      //Emit an event to add the socket id to the user's socket field
+      const add = {userId: user.user._id}
+      socket.emit('add', add);
+    }
+  }, [socket])
 
   /*Handles the sending of messages through the socket */
   if (socket){
@@ -88,11 +97,11 @@ function App() {
           <Route path="/login" element={ 
             !user.auth ? <Login endpoint={ endpoint }
                                 authenticate={ authenticate }/> : <Navigate to="/" /> } />
-          <Route path="/" element={ user.auth ? <Home 
+          {user.auth !== null && <Route path="/" element={ user.auth ? <Home 
                                                   endpoint={ endpoint } 
                                                   socket={ socket } 
                                                   sendMessage={ sendMessage } 
-                                                  user={ user.user }/> : <Navigate to="/login" /> }/>
+                                                  user={ user.user }/> : <Navigate to="/login" /> }/>}
           {user.auth && <Route path="/:request/:id" element={ <People setUser={ setUser } user={ user } endpoint={ endpoint }/> } />}
         </Routes>
       </Router>

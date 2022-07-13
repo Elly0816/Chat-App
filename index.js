@@ -93,14 +93,29 @@ passport.deserializeUser(User.deserializeUser());
 
 io.on('connection', (socket) => {
     console.log(`user ${socket.id} connected to the server`);
+
+    //Listen to when the event to add the socket id to the user's socket field is fired
+    socket.on('add', (arg) => {
+        const currentUser = arg.userId;
+        User.findByIdAndUpdate(currentUser, { $set: { socketId: socket.id } }, { new: true },
+            (err, user) => {
+                if (err) {
+                    console.log(err);
+                } else if (!user) {
+                    console.log("There was no user found");
+                } else {
+                    console.log("The socket id was added to the user");
+                    console.log(user);
+                }
+            });
+    });
+
     socket.on("disconnect", () => {
         console.log(`user ${socket.id} disconnected from the server`);
 
     });
 
-    //Listen to when the event to add the socket id to the user's socket field is fired
 
-    //Listen to when the event to remove the socket id from the user's socket field is fired
 
     /*This sends a message to the user currently being chatted with */
     socket.on('send', (arg) => {
@@ -122,8 +137,18 @@ io.on('connection', (socket) => {
                                 console.log(err);
                             } else {
                                 //Find the current user and set the socket id to the current on if it is not already that
-                                User.findByIdAndUpdate(senderId, { $set: { socket: socket.id } })
-                                socket.emit('receive', msgs);
+                                User.findById(otherUserId, (err, user) => {
+                                    if (err) {
+                                        console.log(err);
+                                    } else if (!user) {
+                                        console.log("The other user could not be found while retreiving the socket id");
+                                    } else {
+                                        const socketId = user.socketId;
+                                        io.to(socketId).emit('receive', msgs);
+                                        socket.emit('receive', msgs);
+
+                                    }
+                                })
                             }
                         })
                     }
@@ -252,6 +277,7 @@ app.get('/:id', (req, res) => {
             console.log("There was an error with the database");
         } else if (!user) {
             console.log("There was no user found in the database");
+            res.send({ user: 'None' })
         } else {
             res.send({ user: user });
         }
@@ -554,7 +580,7 @@ app.route("/connection/:id")
 
     });
 
-//Create chat between current user and requested connected user
+//Send user chats
 app.route('/chats/:user')
     .get((req, res) => {
         const userId = req.params.user;
@@ -586,7 +612,7 @@ app.route('/chats/:user')
 
     })
 
-
+//Creates Chat between two users
 app.route('/chat/:user/:other')
     .get((req, res) => {
         //Check if the other user is in the connections of the current user
