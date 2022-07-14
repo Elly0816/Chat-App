@@ -115,7 +115,47 @@ io.on('connection', (socket) => {
 
     });
 
-
+    //Socket on delete
+    socket.on('delete', (arg) => {
+        const otherUser = arg.otherUser;
+        const messageId = arg.id;
+        const chatId = arg.chatId;
+        Message.findByIdAndUpdate(messageId, { $set: { text: '***This message was deleted***' } }, { new: true }, (err, message) => {
+            if (err) {
+                console.log(err);
+            } else if (!message) {
+                console.log("The message to delete was not found");
+            } else {
+                Chat.findById(chatId, (err, chat) => {
+                    if (err) {
+                        console.log(err);
+                    } else if (!chat) {
+                        console.log("The chat that the message was deleted from was not found");
+                    } else {
+                        User.findById(otherUser, (err, user) => {
+                            if (err) {
+                                console.log("There was an error in the database");
+                            } else if (!user) {
+                                console.log("The other user was not found after deleting the message");
+                            } else {
+                                const messages = chat.messages.map(message => message.toString());
+                                Message.find({ '_id': { $in: messages } }, (err, msgs) => {
+                                    if (err) {
+                                        console.log(err);
+                                    } else if (!msgs) {
+                                        console.log("Could not find the messages from the chat after deleting the message");
+                                    } else {
+                                        socket.emit('deleted', msgs);
+                                        io.to(user.socketId).emit('deleted', msgs);
+                                    }
+                                })
+                            }
+                        })
+                    }
+                });
+            }
+        })
+    });
 
     /*This sends a message to the user currently being chatted with */
     socket.on('send', (arg) => {

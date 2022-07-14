@@ -44,9 +44,25 @@ export default function Home(props){
             console.log(arg);
             setMessages(arg);
             // setMessages([...messages, arg])
+        
+
+        props.socket.on('deleted', (arg) => {
+            console.log(arg);
+            setMessages(arg);
+        })
           })
     }
 
+
+    //Delete message
+    function deleteMessage(id){
+        if(props.socket){
+            props.socket.emit('delete', {id: id,
+                 otherUser: otherUserId,
+                chatId: currentChatId});
+        }
+    }
+    
 
     //This initally loads up the messages chat from the database
     function getMessages(id, otherUserName) {
@@ -71,7 +87,7 @@ export default function Home(props){
     return <div className='home'>
                     <Chats setUserId={setUserId} setId={setId} getMessages={getMessages} items={items}/>
                     {!messages ? <h5>Your chats are on the left. Click on one to view the messages.</h5> 
-                    : <div className='message-container-container'><Messages userId={props.user._id} messages={messages}/>
+                    : <div className='message-container-container'><Messages deleteMessage={deleteMessage} userId={props.user._id} messages={messages}/>
                         <Entry otherUserId={otherUserId} chatId={currentChatId} sendMessage={ props.sendMessage } userId={props.user._id}/>
             </div>}            
     </div>

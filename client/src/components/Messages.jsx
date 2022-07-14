@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import Button from 'react-bootstrap/Button';
 
 export default function Messages(props){
 
@@ -14,12 +15,16 @@ export default function Messages(props){
         
     }, [props.messages]);
 
-
+   
 
 
     return <div className='message-container' ref={messageContainer}>{props.messages.map((message, index) => <div key={index} className={message.sender.toString() === props.userId ? 'my-messages': 'other-messages'}>
     <h6>{ message.text }</h6>
-    <p>{ new Date(message.time).getHours() }:{new Date(message.time).getMinutes()}:{new Date(message.time).getSeconds()}</p>
+    <div className='message-bottom'>
+        <p className='message-time'>{ new Date(message.time).getHours() }:{new Date(message.time).getMinutes()}:{new Date(message.time).getSeconds()}</p>
+        { message.text !== '***This message was deleted***' && message.sender.toString() === props.userId && <Button onClick={() => {props.deleteMessage(message._id)}} variant='outline' style={{fontSize: 'x-small', position: 'absolute', right: '20px'}}>X</Button>}
+    </div>
+    
 </div> )} 
 </div>
 }

@@ -26,11 +26,9 @@ function App() {
   /*This checks if a user has previously logged in */
   useEffect(() => {
     const loggedInUser = localStorage.getItem('user');
-    // console.log(JSON.stringify(loggedInUser));
-    if (loggedInUser){
-      // setUser({auth: true, user: {_id: JSON.parse(loggedInUser)._id}});
+    const userInStorage = JSON.parse(loggedInUser);
+    if (userInStorage){
       function getUser(){
-        const userInStorage = JSON.parse(loggedInUser);
         axios.get(`${endpoint}${userInStorage._id}`)
         .then(response => {
           if (response.data.user){
@@ -43,6 +41,8 @@ function App() {
         })
       }
       getUser();
+    } else {
+      setUser({auth: false, user: {}});
     }}, []);
 
 
