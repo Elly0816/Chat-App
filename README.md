@@ -17,3 +17,12 @@ To install dependencies, run:
 ```bash
 npm init
 ```
+
+
+Server runs on localhost://5000
+
+## Run:
+
+```bash
+nodemon index.js
+```
