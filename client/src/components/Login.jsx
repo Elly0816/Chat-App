@@ -59,7 +59,7 @@ export default function Login(props){
                     password: password
                 })
                 .then(response => {
-                    console.log(response.data);
+                    //console.log(response.data);
                     if (response.data.response === 'login'){
                         setRegister(false);
                         setExists(true);
@@ -67,7 +67,7 @@ export default function Login(props){
                     } else if (response.data.response === 'register'){
                         setRegister(true);
                     } else {
-                        console.log(response.data.user);
+                        //console.log(response.data.user);
                         /*This saves the user to the local storage for login persistence*/
                         localStorage.setItem('user', JSON.stringify(response.data.user));
                         axios.defaults.headers.common['Authorization'] = 
@@ -91,13 +91,13 @@ export default function Login(props){
                 password: password
             })
             .then(response => { 
-                console.log(response);
+                //console.log(response);
                 if (response.data.response === 'login'){
                     setRegister(false);
                 } else if (response.data.response === 'Incorrect Credentials'){
                     setLoginFailure(true);
                 } else {
-                    console.log(response.data.user);
+                    //console.log(response.data.user);
                     /*This saves the user to the local storage for login persistence*/
                     localStorage.setItem('user', JSON.stringify(response.data.user));
                     axios.defaults.headers.common['Authorization'] =

@@ -32,7 +32,7 @@ export default function Info(props){
         async function getDetails(){
             await axios.get(`${props.endpoint}profile/${id}`)
             .then( response => {
-                console.log(response.data.response);
+                //console.log(response.data.response);
                 setProfile(response.data.response);
                 console.log(`The id is: ${id}`);
                 if (id === props.user.user._id){
@@ -44,7 +44,7 @@ export default function Info(props){
                 
                 })
             .catch(err => {
-                console.log(err);
+                //console.log(err);
             });
         }
         getDetails();
@@ -78,7 +78,7 @@ export default function Info(props){
 
     /*Function to change the details of the user */
     function handleSubmit(e){
-        console.log('submit clicked');
+        //console.log('submit clicked');
         e.preventDefault();
         function changeDetails(){
             axios.patch(`${props.endpoint}profile/${id}`, {
@@ -88,7 +88,7 @@ export default function Info(props){
                 email: profile.email
             })
             .then( response => {
-                console.log(response.data.response);
+                //console.log(response.data.response);
                 props.changeUser({...props.user, user: response.data.response});
             })
             .catch(err => {
@@ -102,7 +102,7 @@ export default function Info(props){
 
     function handleChange(e){
         setProfile({...profile, [e.target.name]:e.target.value});
-        console.log(profile[e.target.name]);
+        //console.log(profile[e.target.name]);
     }
 
     /*Function to send requests to another user*/
@@ -110,7 +110,7 @@ export default function Info(props){
         async function requestSender(){
             await axios.post(`${props.endpoint}request/${props.user.user._id}`, {id: id})
             .then( response => {
-                console.log(response);
+                //console.log(response);
                 props.changeUser({...props.user, user: response.data.user});
                 setReqDisabled(true);
             })
@@ -152,7 +152,7 @@ export default function Info(props){
     function createChat(){
         axios.get(`${props.endpoint}chat/${props.user.user._id}/${profile._id}`)
         .then(response => {
-            console.log(response);
+            //console.log(response);
             navigate("/");
         })
     }

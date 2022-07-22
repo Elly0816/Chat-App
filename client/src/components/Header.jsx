@@ -32,7 +32,7 @@ export default function Header(props) {
 
 
     function goToProfile(){
-        console.log(props.user.user);
+        //console.log(props.user.user);
         navigate(`profile/${props.user.user._id}`);
     }
 

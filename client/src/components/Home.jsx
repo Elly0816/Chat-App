@@ -18,10 +18,10 @@ export default function Home(props){
 
     useEffect(()=>{
         async function getChats(){
-            console.log(`${props.endpoint}chats/${props.user._id}`);
+            //console.log(`${props.endpoint}chats/${props.user._id}`);
             await axios.get(`${props.endpoint}chats/${props.user._id}`)
             .then(response => {
-                console.log(response.data);
+                //console.log(response.data);
                 const chats = response.data.chats;
                 const people = response.data.otherUsers;
                 const peopleAndChats = people.map((person, index) => [person, chats[index]]);
@@ -41,13 +41,13 @@ export default function Home(props){
     //Socket passed down from app
     if(props.socket){
         props.socket.on('receive', (arg) => {
-            console.log(arg);
+            //console.log(arg);
             setMessages(arg);
             // setMessages([...messages, arg])
         
 
         props.socket.on('deleted', (arg) => {
-            console.log(arg);
+            //console.log(arg);
             setMessages(arg);
         })
           })
@@ -69,10 +69,10 @@ export default function Home(props){
         axios.get(`${props.endpoint}messages/${id}`)
         .then(response => {
             if (!response.data.messages){
-                console.log(response.data);
+                //console.log(response.data);
                 setMessages([{text: `Start a chat with ${otherUserName}`}]);
             } else {
-                console.log(response.data.messages)
+                //console.log(response.data.messages)
                 setMessages(response.data.messages);
             }
         })

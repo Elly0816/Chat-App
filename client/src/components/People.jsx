@@ -22,7 +22,7 @@ export default function People(props){
                 {   
                     setTitle(`${lodash.capitalize(request)}s`);
                     setPeople(response.data.users);
-                    console.log(response.data);
+                    //console.log(response.data);
                 }
                 )
                 .catch(err => console.log(err));
@@ -31,7 +31,7 @@ export default function People(props){
                 .then(response => 
                 {   setTitle('Pending Requests');
                     setPeople(response.data.pending);
-                console.log(response.data);
+                //console.log(response.data);
                 }
                 )
                 .catch(err => console.log(err));
