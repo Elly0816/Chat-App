@@ -26,6 +26,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.set('trust proxy', 1)
 
+const url = "mongodb+srv://Eleazar:<NFZzcKaAncuS12Wm>@cluster0.l8jn0bx.mongodb.net/?retryWrites=true&w=majority+srv://<elzoremmanuel@gmail.com>:<NFZzcKaAncuS12Wm>@chat-app.mongodb.net/test?retryWrites=true&w=majority&useNewUrlParser=true&useUnifiedTopology=true";
 
 
 
@@ -39,7 +40,7 @@ const io = new Server(server, {
     }
 });
 
-mongoose.connect('mongodb://localhost:27017/chatDB');
+mongoose.connect(url);
 
 const port = process.env.PORT || 5000;
 
