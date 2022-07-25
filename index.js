@@ -10,6 +10,7 @@ const session = require('express-session');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const path = require('path');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 
 
 
@@ -40,7 +41,9 @@ const io = new Server(server, {
     }
 });
 
-mongoose.connect('mongodb://localhost:27017/chatDB');
+
+mongoose.connect(url);
+// mongoose.connect('mongodb://localhost:27017/chatDB');
 
 const port = process.env.PORT || 5000;
 
