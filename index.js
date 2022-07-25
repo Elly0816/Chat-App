@@ -26,7 +26,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.set('trust proxy', 1)
 
-const url = "mongodb+srv://Eleazar:<NFZzcKaAncuS12Wm>@cluster0.l8jn0bx.mongodb.net/?retryWrites=true&w=majority";
+const url = process.env.MONGO;
 
 
 
