@@ -52,7 +52,7 @@ export default function Login(props){
         if (register){
             const { firstName, lastName, email, password, password2 } = form;
             if ( password === password2 ){
-                await axios.post(`${props.endpoint}register`, {
+                await axios.post(`${props.endpoint}api/register`, {
                     firstName: firstName,
                     lastName: lastName,
                     email: email,
@@ -86,7 +86,7 @@ export default function Login(props){
         else {
             /*This handles login */
             const { email, password } = form;
-            await axios.post(`${props.endpoint}login`, {
+            await axios.post(`${props.endpoint}api/login`, {
                 email: email,
                 password: password
             })

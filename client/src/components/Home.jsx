@@ -19,7 +19,7 @@ export default function Home(props){
     useEffect(()=>{
         async function getChats(){
             //console.log(`${props.endpoint}chats/${props.user._id}`);
-            await axios.get(`${props.endpoint}chats/${props.user._id}`)
+            await axios.get(`${props.endpoint}api/chats/${props.user._id}`)
             .then(response => {
                 //console.log(response.data);
                 const chats = response.data.chats;
@@ -66,7 +66,7 @@ export default function Home(props){
 
     //This initally loads up the messages chat from the database
     function getMessages(id, otherUserName) {
-        axios.get(`${props.endpoint}messages/${id}`)
+        axios.get(`${props.endpoint}api/messages/${id}`)
         .then(response => {
             if (!response.data.messages){
                 //console.log(response.data);

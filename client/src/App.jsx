@@ -8,7 +8,7 @@ import axios from 'axios';
 import Login from './components/Login';
 import Info from './components/Info';
 import People from './components/People';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 
 function App() {
@@ -30,7 +30,7 @@ function App() {
       const userInStorage = JSON.parse(loggedInUser);
       if (userInStorage){
       function getUser(){
-        axios.get(`${endpoint}${userInStorage._id}`)
+        axios.get(`${endpoint}api/user/${userInStorage._id}`)
         .then(response => {
           if (response.data.user){
             localStorage.setItem('user', JSON.stringify(response.data.user));

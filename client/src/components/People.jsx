@@ -17,7 +17,7 @@ export default function People(props){
     useEffect(() => {
         async function getPeople(){
             if (request !== 'pendingRequests') {
-                await axios.get(`${props.endpoint}${request}/${id}`)
+                await axios.get(`${props.endpoint}api/${request}/${id}`)
                 .then(response => 
                 {   
                     setTitle(`${lodash.capitalize(request)}s`);
@@ -27,7 +27,7 @@ export default function People(props){
                 )
                 .catch(err => console.log(err));
             } else {
-                await axios.get(`${props.endpoint}request/${id}`)
+                await axios.get(`${props.endpoint}api/request/${id}`)
                 .then(response => 
                 {   setTitle('Pending Requests');
                     setPeople(response.data.pending);
@@ -44,7 +44,7 @@ export default function People(props){
     function handleClick(id, todo){
         switch (todo) {
             case "cancel sent request" :
-                axios.patch(`${props.endpoint}pending-requests/${props.user.user._id}`, {id: id})
+                axios.patch(`${props.endpoint}api/pending-requests/${props.user.user._id}`, {id: id})
                 .then(response => {
                 props.setUser({...props.user, user: response.data.user})
                 setPeople(people.filter((person) => person._id !== id));
@@ -62,7 +62,7 @@ export default function People(props){
                 .catch(err => console.log(err));
                 break
             case "accept request":
-                axios.post(`${props.endpoint}connection/${props.user.user._id}`, {id: id})
+                axios.post(`${props.endpoint}api/connection/${props.user.user._id}`, {id: id})
                 .then(response => {
                 props.setUser({...props.user, user: response.data.user})
                 setPeople(people.filter((person) => person._id !== id));
@@ -71,7 +71,7 @@ export default function People(props){
                 .catch(err => console.log(err));
                 break
             case "remove connection":
-                axios.patch(`${props.endpoint}connection/${props.user.user._id}`, {id: id})
+                axios.patch(`${props.endpoint}api/connection/${props.user.user._id}`, {id: id})
                 .then(response => {
                     props.setUser({...props.user, user: response.data.user})
                     setPeople(people.filter(person => person._id !== id));
@@ -90,7 +90,7 @@ export default function People(props){
         <h2>{ title }</h2>
         <hr/>
         { people && people.map(person => <div style={{display:'flex'}} key={person._id} className='person'>
-        <a style={{textDecoration:'none', color:'black'}} href={`/profile/${person._id}`}><h5>{ person.fullName}</h5></a>
+        <a style={{textDecoration:'none', color:'black'}} href={`/#/profile/${person._id}`}><h5>{ person.fullName}</h5></a>
         {title==='Pending Requests' && <Button
          onClick={() => handleClick(person._id, 'cancel sent request')} 
          style={{margin: '0 10px'}} variant='danger'>Cancel Request</Button>}

@@ -13,7 +13,7 @@ export default function Header(props) {
 
     function logout(){
         async function out(){
-            await axios.post(`${props.endpoint}logout`)
+            await axios.post(`${props.endpoint}api/logout`)
             .then(response => {
                 props.logout(false);
                 localStorage.clear();
@@ -33,7 +33,7 @@ export default function Header(props) {
 
     function goToProfile(){
         //console.log(props.user.user);
-        navigate(`profile/${props.user.user._id}`);
+        navigate(`/profile/${props.user.user._id}`);
     }
 
 

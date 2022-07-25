@@ -30,7 +30,7 @@ export default function Info(props){
     /*This gets the details of the user whose id matches the id of use params */
     useEffect(() => {
         async function getDetails(){
-            await axios.get(`${props.endpoint}profile/${id}`)
+            await axios.get(`${props.endpoint}api/profile/${id}`)
             .then( response => {
                 //console.log(response.data.response);
                 setProfile(response.data.response);
@@ -81,7 +81,7 @@ export default function Info(props){
         //console.log('submit clicked');
         e.preventDefault();
         function changeDetails(){
-            axios.patch(`${props.endpoint}profile/${id}`, {
+            axios.patch(`${props.endpoint}api/profile/${id}`, {
                 firstName: profile.firstName,
                 lastName: profile.lastName,
                 fullName: `${profile.firstName} ${profile.lastName}`,
@@ -108,7 +108,7 @@ export default function Info(props){
     /*Function to send requests to another user*/
     function sendRequest(e){
         async function requestSender(){
-            await axios.post(`${props.endpoint}request/${props.user.user._id}`, {id: id})
+            await axios.post(`${props.endpoint}api/request/${props.user.user._id}`, {id: id})
             .then( response => {
                 //console.log(response);
                 props.changeUser({...props.user, user: response.data.user});
@@ -125,7 +125,7 @@ export default function Info(props){
 
     function acceptRequest(){
         async function accept(){
-            axios.post(`${props.endpoint}connection/${props.user.user._id}`, {id: id})
+            axios.post(`${props.endpoint}api/connection/${props.user.user._id}`, {id: id})
                 .then(response => {
                 props.changeUser({...props.user, user: response.data.user})
                 setConnected(true);
@@ -137,7 +137,7 @@ export default function Info(props){
 
     function removeConnection(){
         async function remove(){
-            axios.patch(`${props.endpoint}connection/${props.user.user._id}`, {id: id})
+            axios.patch(`${props.endpoint}api/connection/${props.user.user._id}`, {id: id})
                 .then(response => {
                     props.changeUser({...props.user, user: response.data.user})
                     setConnected(false);
@@ -150,7 +150,7 @@ export default function Info(props){
     
     //Creates or returns chat between two users
     function createChat(){
-        axios.get(`${props.endpoint}chat/${props.user.user._id}/${profile._id}`)
+        axios.get(`${props.endpoint}api/chat/${props.user.user._id}/${profile._id}`)
         .then(response => {
             //console.log(response);
             navigate("/");

@@ -45,7 +45,7 @@ mongoose.connect('mongodb://localhost:27017/chatDB');
 const port = process.env.PORT || 5000;
 
 
-app.use(express.static(path.join(__dirname, './client/build')));
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 /*Message Schema*/
 
@@ -99,7 +99,7 @@ passport.deserializeUser(User.deserializeUser());
 */
 
 io.on('connection', (socket) => {
-    //console.log(`user ${socket.id} connected to the server`);
+    console.log(`user ${socket.id} connected to the server`);
 
     //Listen to when the event to add the socket id to the user's socket field is fired
     socket.on('add', (arg) => {
@@ -109,16 +109,16 @@ io.on('connection', (socket) => {
                 if (err) {
                     console.log(err);
                 } else if (!user) {
-                    //console.log("There was no user found");
+                    console.log("There was no user found");
                 } else {
-                    //console.log("The socket id was added to the user");
-                    //console.log(user);
+                    console.log("The socket id was added to the user");
+                    console.log(user);
                 }
             });
     });
 
     socket.on("disconnect", () => {
-        //console.log(`user ${socket.id} disconnected from the server`);
+        console.log(`user ${socket.id} disconnected from the server`);
 
     });
 
@@ -131,26 +131,26 @@ io.on('connection', (socket) => {
             if (err) {
                 console.log(err);
             } else if (!message) {
-                //console.log("The message to delete was not found");
+                console.log("The message to delete was not found");
             } else {
                 Chat.findById(chatId, (err, chat) => {
                     if (err) {
                         console.log(err);
                     } else if (!chat) {
-                        //console.log("The chat that the message was deleted from was not found");
+                        console.log("The chat that the message was deleted from was not found");
                     } else {
                         User.findById(otherUser, (err, user) => {
                             if (err) {
-                                //console.log("There was an error in the database");
+                                console.log("There was an error in the database");
                             } else if (!user) {
-                                //console.log("The other user was not found after deleting the message");
+                                console.log("The other user was not found after deleting the message");
                             } else {
                                 const messages = chat.messages.map(message => message.toString());
                                 Message.find({ '_id': { $in: messages } }, (err, msgs) => {
                                     if (err) {
                                         console.log(err);
                                     } else if (!msgs) {
-                                        //console.log("Could not find the messages from the chat after deleting the message");
+                                        console.log("Could not find the messages from the chat after deleting the message");
                                     } else {
                                         socket.emit('deleted', msgs);
                                         io.to(user.socketId).emit('deleted', msgs);
@@ -188,7 +188,7 @@ io.on('connection', (socket) => {
                                     if (err) {
                                         console.log(err);
                                     } else if (!user) {
-                                        //console.log("The other user could not be found while retreiving the socket id");
+                                        console.log("The other user could not be found while retreiving the socket id");
                                     } else {
                                         const socketId = user.socketId;
                                         io.to(socketId).emit('receive', msgs);
@@ -233,19 +233,21 @@ io.on('connection', (socket) => {
 
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, './client/build', 'index.html'));
+    res.sendFile(path.join(__dirname, './client/build', 'index.html'), (err) => {
+        res.status(500).send(err);
+    });
 });
 
 /*This is the register route */
-app.post('/register', (req, res) => {
+app.post('/api/register', (req, res) => {
     const data = req.body;
-    //console.log(data);
+    console.log(data);
     User.findOne({ username: data.email }, (err, user) => {
         if (err) {
-            //console.log("There was an error with the database");
+            console.log("There was an error with the database 245");
             console.log(err);
         } else if (user) {
-            //console.log("User already exists");
+            console.log("User already exists");
             res.send({ response: 'login' });
         } else {
             User.register(new User({
@@ -257,28 +259,28 @@ app.post('/register', (req, res) => {
             }), password = data.password, (err) => {
                 if (err) {
                     console.log(err);
-                    //console.log("There was an error with registering the user");
+                    console.log("There was an error with registering the user");
                     res.send({ response: 'register' })
                 } else {
-                    //console.log('No error in registering the user');
+                    console.log('No error in registering the user');
                     const authenticate = User.authenticate('local');
                     authenticate(data.email, data.password, (err, user) => {
                         if (err) {
                             console.log(err);
-                            //console.log("There was an error with authenticating the user");
+                            console.log("There was an error with authenticating the user");
                             res.send({ response: 'register' });
                         } else {
-                            //console.log("No error in authenticating the user");
+                            console.log("No error in authenticating the user");
                             req.login(user, (err) => {
                                 if (err) {
-                                    //console.log("There was a error with logging in the user after registeration");
+                                    console.log("There was a error with logging in the user after registeration");
                                     console.log(err);
                                 } else {
-                                    //console.log("Logged in after registeration");
-                                    //console.log('Registering, redirecting to messages page');
+                                    console.log("Logged in after registeration");
+                                    console.log('Registering, redirecting to messages page');
                                     //Jwt of the user
                                     token = jwt.sign({ id: user._id }, process.env.SECRET, { expiresIn: '1h' });
-                                    //console.log(user);
+                                    console.log(user);
                                     res.send({ token: token, user: user });
                                 }
                             });
@@ -292,26 +294,26 @@ app.post('/register', (req, res) => {
 
 
 /*This is the login route */
-app.post('/login', (req, res) => {
+app.post('/api/login', (req, res) => {
     const data = req.body;
-    //console.log(data);
+    console.log(data);
     const authenticate = User.authenticate('local');
     authenticate(data.email, data.password, (err, user) => {
         if (err) {
             console.log(err);
             res.send({ response: 'login' });
         } else if (!user) {
-            //console.log("Incorrect Credentials");
+            console.log("Incorrect Credentials");
             res.send({ response: 'Incorrect Credentials' });
         } else {
-            //console.log("Found user");
+            console.log("Found user");
             req.login(user, (err) => {
                 if (err) {
                     console.log(err);
                 } else {
-                    //console.log("Logged in");
+                    console.log("Logged in");
                     token = jwt.sign({ id: user._id }, process.env.SECRET, { expiresIn: '1h' });
-                    //console.log(user);
+                    console.log(user);
                     res.send({ token: token, user: user });
                 }
             });
@@ -321,13 +323,14 @@ app.post('/login', (req, res) => {
 
 
 // Get current user details
-app.get('/:id', (req, res) => {
+app.get('/api/user/:id', (req, res) => {
     const id = req.params.id;
     User.findById(id, (err, user) => {
         if (err) {
-            //console.log("There was an error with the database");
+            console.log("There was an error with the database 328");
+            console.log(err);
         } else if (!user) {
-            //console.log("There was no user found in the database");
+            console.log("There was no user found in the database");
             res.send({ user: 'None' })
         } else {
             res.send({ user: user });
@@ -337,7 +340,7 @@ app.get('/:id', (req, res) => {
 
 
 /*Logout route */
-app.post('/logout', (req, res) => {
+app.post('/api/logout', (req, res) => {
     req.logout((err) => {
         if (err) {
             console.log(err);
@@ -350,17 +353,17 @@ app.post('/logout', (req, res) => {
 
 /*Profile route*/
 /*Get returns the user details to the client while Post edits the user info such as name and email */
-app.route('/profile/:id')
+app.route('/api/profile/:id')
     .get((req, res) => {
         const id = req.params.id;
         User.findById(id, ['_id', 'firstName', 'lastName', 'fullName', 'email', 'connections', 'requests', 'pendingRequests'], (err, user) => {
             if (err) {
                 console.log(err);
             } else if (!user) {
-                //console.log("This user does not exist");
+                console.log("This user does not exist");
                 res.send({ response: 'User not found!' });
             } else {
-                //console.log(`This is the user: ${user}`);
+                console.log(`This is the user: ${user}`);
                 res.send({ response: user });
             }
         });
@@ -372,10 +375,10 @@ app.route('/profile/:id')
             if (err) {
                 console.log(err);
             } else if (!user) {
-                //console.log("There was no user found");
+                console.log("There was no user found");
                 res.send({ response: 'User not found' });
             } else {
-                //console.log('The user was updated successfully');
+                console.log('The user was updated successfully');
                 res.send({ response: user });
             }
         });
@@ -391,26 +394,26 @@ app.route("/request/:id")
             if (err) {
                 console.log(err);
             } else if (!user) {
-                //console.log("The user does not exist");
+                console.log("The user does not exist");
                 res.send({ response: "This user does not exist" });
             } else {
                 /*This is a list of user id's in the requests field */
                 const requests = user.requests.map(item => item.toString());
                 const pending = user.pendingRequests.map(item => item.toString());
-                //console.log(requests);
+                console.log(requests);
                 User.find({ '_id': { $in: requests } }, ['_id', 'firstName', 'lastName', 'fullName'],
                     (err, users) => {
                         if (err) {
                             console.log(err);
                         } else if (!users) {
-                            //console.log("There were no users found");
+                            console.log("There were no users found");
                         } else {
                             User.find({ '_id': { $in: pending } }, ['_id', 'firstName', 'lastName', 'fullName'],
                                 (err, pendings) => {
                                     if (err) {
                                         console.log(err);
                                     } else if (!pendings) {
-                                        //console.log("There were no users found");
+                                        console.log("There were no users found");
                                     } else {
                                         res.send({ users: users, pending: pendings });
                                     }
@@ -430,18 +433,18 @@ app.route("/request/:id")
                 if (err) {
                     console.log(err);
                 } else if (!user) {
-                    //console.log("The user you're sending the request to does not exist");
+                    console.log("The user you're sending the request to does not exist");
                 } else {
-                    //console.log("The request was sent successfully");
+                    console.log("The request was sent successfully");
                     /*Add the id the request was sent to to the current users' pending requests */
                     User.findByIdAndUpdate(id, { $push: { pendingRequests: requestTo } }, { new: true },
                         (err, user) => {
                             if (err) {
                                 console.log(err);
                             } else if (!user) {
-                                //console.log("The user to add the pending request to was not found")
+                                console.log("The user to add the pending request to was not found")
                             } else {
-                                //console.log("The request was added to your pending request");
+                                console.log("The request was added to your pending request");
                                 res.send({ user: user });
                             }
                         });
@@ -459,18 +462,18 @@ app.route("/request/:id")
                 if (err) {
                     console.log(err);
                 } else if (!user) {
-                    //console.log("The user the request was sent from was not found");
+                    console.log("The user the request was sent from was not found");
                 } else {
-                    //console.log("You were removed from their pending requests");
+                    console.log("You were removed from their pending requests");
                     //Remove other user from current user's requests list
                     User.findByIdAndUpdate(id, { $pull: { requests: requestFrom } }, { new: true },
                         (err, user) => {
                             if (err) {
                                 console.log(err);
                             } else if (!user) {
-                                //console.log("The user to remove the request from was not found");
+                                console.log("The user to remove the request from was not found");
                             } else {
-                                //console.log("You have declined the connection request");
+                                console.log("You have declined the connection request");
                                 res.send({ user: user });
                             }
                         });
@@ -479,7 +482,7 @@ app.route("/request/:id")
     });
 
 /*Route to handle pending requests by deleting them */
-app.patch('/pending-requests/:id', (req, res) => {
+app.patch('/api/pending-requests/:id', (req, res) => {
     const id = req.params.id;
     const toDelete = req.body.id;
     //Remove the current user from the other user's requests
@@ -488,18 +491,18 @@ app.patch('/pending-requests/:id', (req, res) => {
             if (err) {
                 console.log(err);
             } else if (!user) {
-                //console.log("The user the request was sent to was not found");
+                console.log("The user the request was sent to was not found");
             } else {
-                //console.log("Your request was removed from the user's list of requests");
+                console.log("Your request was removed from the user's list of requests");
                 //Remove the other user from the current user's pending requests
                 User.findByIdAndUpdate(id, { $pull: { pendingRequests: toDelete } }, { new: true },
                     (err, user) => {
                         if (err) {
                             console.log(err);
                         } else if (!user) {
-                            //console.log("The user was not found");
+                            console.log("The user was not found");
                         } else {
-                            //console.log("The user was removed from your list of pending requests");
+                            console.log("The user was removed from your list of pending requests");
                             res.send({ user: user });
                         }
                     })
@@ -507,16 +510,16 @@ app.patch('/pending-requests/:id', (req, res) => {
         })
 });
 
-app.route("/connection/:id")
+app.route("/api/connection/:id")
     .get((req, res) => {
         const id = req.params.id;
         User.findById(id, ['connections'], (err, user) => {
             if (err) {
                 console.log(err);
             } else if (!user) {
-                //console.log("Your account was not found");
+                console.log("Your account was not found");
             } else {
-                //console.log("Your account was found");
+                console.log("Your account was found");
                 const connections = user.connections.map(connection => connection.toString());
                 //Find the users that have id's in the current users' connections
                 User.find({ '_id': { $in: connections } }, ['_id', 'firstName', 'lastName', 'fullName'],
@@ -524,7 +527,7 @@ app.route("/connection/:id")
                         if (err) {
                             console.log(err);
                         } else if (!users) {
-                            //console.log('There are no users found')
+                            console.log('There are no users found')
                         } else {
                             res.send({ users: users });
                         }
@@ -541,54 +544,54 @@ app.route("/connection/:id")
                 if (err) {
                     console.log(err);
                 } else if (!user) {
-                    //console.log("The other user was not found when removing you from their pending request");
+                    console.log("The other user was not found when removing you from their pending request");
                 } else {
-                    //console.log("You have been removed from their pending requests")
-                    //Add the current user to the other users's connections
+                    console.log("You have been removed from their pending requests")
+                        //Add the current user to the other users's connections
                     User.findByIdAndUpdate(requestFrom, { $push: { connections: id } }, { new: true },
                         (err, user) => {
                             if (err) {
                                 console.log(err);
                             } else if (!user) {
-                                //console.log("Could not find other user to add connection to");
+                                console.log("Could not find other user to add connection to");
                             } else {
-                                //console.log("You were added to the other user's connection");
+                                console.log("You were added to the other user's connection");
                                 //Remove the other user from the current users' requests
                                 User.findByIdAndUpdate(id, { $pull: { requests: requestFrom } }, { new: true },
                                     (err, user) => {
                                         if (err) {
                                             console.log(err);
                                         } else if (!user) {
-                                            //console.log("Could not find your account");
+                                            console.log("Could not find your account");
                                         } else {
-                                            //console.log("The user was removed from your requests");
+                                            console.log("The user was removed from your requests");
                                             //Remove the other user from the current user's pending requests
                                             User.findByIdAndUpdate(id, { $pull: { pendingRequests: requestFrom } }, { new: true },
                                                 (err, user) => {
                                                     if (err) {
                                                         console.log(err);
                                                     } else if (!user) {
-                                                        //console.log("Could not find your account");
+                                                        console.log("Could not find your account");
                                                     } else {
-                                                        //console.log("The user was removed from your pending requests");
+                                                        console.log("The user was removed from your pending requests");
                                                         //Remove the current user from the other user's pending requests
                                                         User.findByIdAndUpdate(requestFrom, { $pull: { pendingRequests: id } }, { new: true },
                                                             (err, user) => {
                                                                 if (err) {
                                                                     console.log(err);
                                                                 } else if (!user) {
-                                                                    //console.log("Could not find your account");
+                                                                    console.log("Could not find your account");
                                                                 } else {
-                                                                    //console.log("You were removed from the user's pending requests");
+                                                                    console.log("You were removed from the user's pending requests");
                                                                     //Add the connection request sender to the current user's connections
                                                                     User.findByIdAndUpdate(id, { $push: { connections: requestFrom } }, { new: true },
                                                                         (err, user) => {
                                                                             if (err) {
                                                                                 console.log(err);
                                                                             } else if (!user) {
-                                                                                //console.log("Your account was not found while trying to add to connection");
+                                                                                console.log("Your account was not found while trying to add to connection");
                                                                             } else {
-                                                                                //console.log("The user was added to your connections");
+                                                                                console.log("The user was added to your connections");
                                                                                 res.send({ user: user });
                                                                             }
                                                                         });
@@ -611,17 +614,17 @@ app.route("/connection/:id")
             if (err) {
                 console.log(err);
             } else if (!user) {
-                //console.log("The other user could not be found while deleting from connections");
+                console.log("The other user could not be found while deleting from connections");
             } else {
-                //console.log("You were removed from the other user's connections");
+                console.log("You were removed from the other user's connections");
                 //Remove the other user from the logged in user's connections
                 User.findByIdAndUpdate(id, { $pull: { connections: toRemove } }, { new: true }, (err, user) => {
                     if (err) {
                         console.log(err);
                     } else if (!user) {
-                        //console.log("Could not find your account while deleting the other user from your connections");
+                        console.log("Could not find your account while deleting the other user from your connections");
                     } else {
-                        //console.log("The other user was removed from your connections");
+                        console.log("The other user was removed from your connections");
                         res.send({ user: user });
                     }
                 })
@@ -632,14 +635,14 @@ app.route("/connection/:id")
     });
 
 //Send user chats
-app.route('/chats/:user')
+app.route('/api/chats/:user')
     .get((req, res) => {
         const userId = req.params.user;
         User.findById(userId, 'chats', (err, user) => {
             if (err) {
                 console.log(err);
             } else if (!user) {
-                //console.log("The user does not exist");
+                console.log("The user does not exist");
             } else {
                 const chats = user.chats.map(chat => chat.toString());
                 Chat.find({ '_id': { $in: chats } }, (err, chats) => {
@@ -647,7 +650,7 @@ app.route('/chats/:user')
                         console.log(err);
                     } else {
                         const otherUsers = chats.map(chat => chat.between.filter(id => id.toString() !== userId)).map(id => id.toString());
-                        //console.log(otherUsers);
+                        console.log(otherUsers);
                         User.find({ '_id': { $in: otherUsers } }, 'fullName', (err, users) => {
                             if (err) {
                                 console.log(err);
@@ -664,7 +667,7 @@ app.route('/chats/:user')
     })
 
 //Creates Chat between two users
-app.route('/chat/:user/:other')
+app.route('/api/chat/:user/:other')
     .get((req, res) => {
         //Check if the other user is in the connections of the current user
         const userId = req.params.user;
@@ -673,9 +676,9 @@ app.route('/chat/:user/:other')
             if (err) {
                 console.log(err);
             } else if (!user) {
-                //console.log("The current user was not found while checking if connections exists");
+                console.log("The current user was not found while checking if connections exists");
             } else {
-                //console.log(user);
+                console.log(user);
                 const connections = user.connections;
                 if (connections.includes(mongoose.Types.ObjectId(otherId))) {
                     // Find the chat between the current user and the other user
@@ -687,32 +690,34 @@ app.route('/chat/:user/:other')
                         }
                     }, (err, chat) => {
                         if (err) {
-                            //console.log("There was an error with the database");
+                            console.log("There was an error with the database 690");
+                            console.log(err);
                         } else if (!chat) {
                             //If the chat was not found, create it and add it to both users chat field
                             Chat.create({ between: [userId, otherId] }, (err, chat) => {
                                 if (err) {
-                                    //console.log("There was an error with the database while creating the chat");
+                                    console.log("There was an error with the database while creating the chat");
+                                    console.log(err);
                                 } else {
-                                    //console.log("The chat was created");
+                                    console.log("The chat was created");
                                     //Add the chat to the current user's document
                                     User.findByIdAndUpdate(otherId, { $push: { chats: chat._id } }, { new: true },
                                         (err, otherUser) => {
                                             if (err) {
                                                 console.log(err);
                                             } else if (!otherUser) {
-                                                //console.log("The current user could not be found");
+                                                console.log("The current user could not be found");
                                             } else {
-                                                //console.log("The chat was added to the other user's document");
+                                                console.log("The chat was added to the other user's document");
                                                 //Add the chat to the other user's document
                                                 User.findByIdAndUpdate(userId, { $push: { chats: chat._id } }, { new: true },
                                                     (err, currentUser) => {
                                                         if (err) {
                                                             console.log(err);
                                                         } else if (!currentUser) {
-                                                            //console.log("The other user could not be found");
+                                                            console.log("The other user could not be found");
                                                         } else {
-                                                            //console.log("The chat was added to the current user's document");
+                                                            console.log("The chat was added to the current user's document");
                                                             // res.send({ chat: chat });
                                                             //Return the chats of the current user and the name and id of the other users in the chat
                                                             const chats = currentUser.chats.map(chat => chat.toString());
@@ -723,7 +728,7 @@ app.route('/chat/:user/:other')
                                                                     const otheruserIds = chats.map(chat => chat.between.filter(id => id.toString() !== userId)).map(id => id.toString());
                                                                     // let otheruserIds = between;
                                                                     // otheruserIds = otheruserIds.filter(id => id !== userId);
-                                                                    //console.log(`other user id ${otheruserIds}, user id: ${userId}`);
+                                                                    console.log(`other user id ${otheruserIds}, user id: ${userId}`);
                                                                     User.find({ '_id': { $in: otheruserIds } }, ['_id', 'fullName'], (err, users) => {
                                                                         if (err) {
                                                                             console.log(err);
@@ -742,7 +747,7 @@ app.route('/chat/:user/:other')
                             });
                         } else {
                             //Send the chat and the corresponding user to the client if it was found
-                            //console.log("The chat was found");
+                            console.log("The chat was found");
                             const chatIds = user.chats.map(chat => chat._id.toString());
                             // const chats = user.chats;
                             Chat.find({ _id: { $in: chatIds } }, (err, chats) => {
@@ -752,7 +757,7 @@ app.route('/chat/:user/:other')
                                     const otheruserIds = chats.map(chat => chat.between.filter(id => id.toString() !== userId)).map(id => id.toString());
                                     // let otheruserIds = between;
                                     // otheruserIds = otheruserIds.filter(id => id !== userId);
-                                    //console.log(`other user id ${otheruserIds}, user id: ${userId}`);
+                                    console.log(`other user id ${otheruserIds}, user id: ${userId}`);
                                     User.find({ '_id': { $in: otheruserIds } }, ['_id', 'fullName'], (err, users) => {
                                         if (err) {
                                             console.log(err);
@@ -776,23 +781,23 @@ app.route('/chat/:user/:other')
 
 
 //This gets the messages from a certain chat
-app.route('/messages/:id')
+app.route('/api/messages/:id')
     .get((req, res) => {
         const chatId = req.params.id;
         Chat.findById(chatId, (err, chat) => {
             if (err) {
                 console.log(err);
             } else if (!chat) {
-                //console.log("There was no chat found");
+                console.log("There was no chat found");
             } else {
                 const messages = chat.messages.map(message => message.toString());
                 Message.find({ '_id': { $in: messages } }, (err, messages) => {
                     if (err) {
                         console.log(err);
                     } else if (!messages) {
-                        //console.log("There were no messages found");
+                        console.log("There were no messages found");
                     } else {
-                        //console.log(messages);
+                        console.log(messages);
                         res.send({ messages: messages });
                     }
                 });
@@ -801,5 +806,5 @@ app.route('/messages/:id')
     });
 
 server.listen(port, () => {
-    //console.log(`Server up and running at ${port}`);
+    console.log(`Server up and running at ${port}`);
 });
