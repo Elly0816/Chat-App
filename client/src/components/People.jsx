@@ -48,7 +48,7 @@ export default function People(props){
                 .then(response => {
                 props.setUser({...props.user, user: response.data.user})
                 setPeople(people.filter((person) => person._id !== id));
-                navigate(`/profile/${props.user.user._id}`);
+                navigate(`/#/profile/${props.user.user._id}`);
                 })
                 .catch(err => console.log(err));
                 break
@@ -57,7 +57,7 @@ export default function People(props){
                 .then(response => {
                 props.setUser({...props.user, user: response.data.user})
                 setPeople(people.filter((person) => person._id !== id));
-                navigate(`/profile/${props.user.user._id}`);
+                navigate(`/#/profile/${props.user.user._id}`);
                 })
                 .catch(err => console.log(err));
                 break
@@ -66,7 +66,7 @@ export default function People(props){
                 .then(response => {
                 props.setUser({...props.user, user: response.data.user})
                 setPeople(people.filter((person) => person._id !== id));
-                navigate(`/profile/${props.user.user._id}`);
+                navigate(`/#/profile/${props.user.user._id}`);
                 })
                 .catch(err => console.log(err));
                 break
@@ -75,7 +75,7 @@ export default function People(props){
                 .then(response => {
                     props.setUser({...props.user, user: response.data.user})
                     setPeople(people.filter(person => person._id !== id));
-                    navigate(`/profile/${props.user.user._id}`);
+                    navigate(`/#/profile/${props.user.user._id}`);
                 })
                 .catch(err => console.log(err));
                 break

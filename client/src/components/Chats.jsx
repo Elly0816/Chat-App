@@ -15,7 +15,7 @@ export default function Chats(props){
                          } 
                          className='chat-tile' 
                          key={item[0]._id}>
-        <p><a style={{textDecoration: 'None', color: 'black'}} href={`/profile/${item[0]._id}`}>{item[0].fullName}</a></p><hr/>
+        <p><a style={{textDecoration: 'None', color: 'black'}} href={`/#/profile/${item[0]._id}`}>{item[0].fullName}</a></p><hr/>
      </div> )}
 </div>
 }
