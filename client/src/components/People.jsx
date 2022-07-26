@@ -79,6 +79,13 @@ export default function People(props){
                 })
                 .catch(err => console.log(err));
                 break
+            case "create chat":
+                axios.get(`${props.endpoint}api/chat/${props.user.user._id}/${id}`)
+                .then(response => {
+                    navigate('/');
+                })
+                .catch(err => console.log(err));
+                break
             default:
                 //pass
                 break
@@ -108,6 +115,7 @@ export default function People(props){
                                                                     style={{margin: '0 10px'}} variant='danger'>Remove Connection
                                                                     </Button>
                                                                     <Button
+                                                                    onClick={() => handleClick(person._id, 'create chat')}
                                                                     style={{margin: '0 10px'}} variant='primary'>Chat
                                                                     </Button>
                                                                  </div>}
