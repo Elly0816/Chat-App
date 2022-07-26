@@ -390,7 +390,7 @@ app.route('/api/profile/:id')
 
 
 /*Handle connection requests */
-app.route("/request/:id")
+app.route("/api/request/:id")
     .get((req, res) => {
         const id = req.params.id;
         User.findById(id, ['requests', 'pendingRequests'], (err, user) => {
