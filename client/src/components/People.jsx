@@ -96,7 +96,7 @@ export default function People(props){
     return <div className='people'>
         <h2>{ title }</h2>
         <hr/>
-        { people && people.map(person => <div style={{display:'flex'}} key={person._id} className='person'>
+        { people && people.map(person => <div style={{display:'grid', margin: '10px', gridAutoColumns: '3fr', gridAutoFlow: 'column'}} key={person._id} className='person'>
         <a style={{textDecoration:'none', color:'black'}} href={`/#/profile/${person._id}`}><h5>{ person.fullName}</h5></a>
         {title==='Pending Requests' && <Button
          onClick={() => handleClick(person._id, 'cancel sent request')} 

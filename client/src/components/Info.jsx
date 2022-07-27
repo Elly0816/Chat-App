@@ -120,7 +120,7 @@ export default function Info(props){
     }
 
     function getRequests(request){
-        navigate(`/#/${request}/${profile._id}`);
+        navigate(`/${request}/${profile._id}`);
     }
 
     function acceptRequest(){
