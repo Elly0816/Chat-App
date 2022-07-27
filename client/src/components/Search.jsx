@@ -27,7 +27,7 @@ export default function Search(props){
     function handleSubmit(e){
         e.preventDefault();
         if (users.length === 1 ){
-            navigate(`/#/profile/${users[0]._id}`);
+            navigate(`/profile/${users[0]._id}`);
             props.close();
         }
     }

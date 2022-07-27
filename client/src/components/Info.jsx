@@ -96,7 +96,7 @@ export default function Info(props){
             })
         }
         changeDetails();
-        navigate(`/#/profile/${id}`);
+        navigate(`/profile/${id}`);
 
     }
 
