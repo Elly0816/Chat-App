@@ -30,6 +30,7 @@ git clone https://github.com/Elly0816/Chat-App.git
 
 ```bash
 npm init
+npm install
 ```
 
 
