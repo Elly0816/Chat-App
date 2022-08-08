@@ -10,7 +10,6 @@ const session = require('express-session');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const path = require('path');
-const { MongoClient, ServerApiVersion } = require('mongodb');
 
 
 
@@ -27,7 +26,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.set('trust proxy', 1)
 
-const url = process.env.MONGO;
+const url = process.env.NODE_ENV ? process.env.MONGO : "mongodb://localhost:27017/chatDB";
 
 
 
