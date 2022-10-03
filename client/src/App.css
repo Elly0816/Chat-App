@@ -9,8 +9,11 @@ h6 {
 }
 
 .app {
-    margin: 2em auto;
-    max-width: 50em;
+    /* margin: 2em auto; */
+    /* max-width: 50em; */
+    height: 100vh;
+    width: 100vw;
+    background-color: black;
 }
 
 .header {

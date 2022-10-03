@@ -94,7 +94,7 @@ function App() {
   return (
     <div className='app'>
       <Router>
-        <Header endpoint={endpoint} logout={ authenticate } user={ user } socket={ socket }/>
+        { user.auth && <Header endpoint={endpoint} logout={ authenticate } user={ user } socket={ socket }/>}
         <Routes>
           {/* { user.auth ? <Route path="/profile/:id" element={ <Info endpoint={endpoint}/> }/> :
             <Navigate to="/login"/>} */}
