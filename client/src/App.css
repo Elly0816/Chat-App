@@ -35,14 +35,27 @@ h6 {
     grid-column-end: 3;
     background-color: blue;
     border-radius: 1em 1em;
+    color: white;
+    padding: 1%;
 }
 
 .loginForm {
     grid-column-start: 3;
     grid-column-end: 6;
     padding: 1em 15%;
+    max-width: 70%;
+    /* min-height: 100vh; */
     /* background-color: blanchedalmond; */
     /* border-radius: 0 2em 2em 0; */
+}
+
+.footer {
+    /* margin-top: 10%; */
+    position: absolute;
+    margin-bottom: 1em;
+    bottom: 0;
+    justify-content: center;
+    text-align: center;
 }
 
 .title {
@@ -66,7 +79,7 @@ h6 {
 }
 
 .form-action {
-    margin: auto 35%;
+    margin-top: 30%;
     width: max-content;
 }
 

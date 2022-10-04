@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
+import Footer from './Footer';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login(props){
@@ -127,7 +128,9 @@ export default function Login(props){
 
     return <div className='loginPage'>
         <section className='loginSide'>
-            
+            <h4>Welcome to Chat-App</h4>
+            { register ? <h1> Sign Up </h1> : <h1> Login </h1>}
+            <Footer/>
         </section>
         <section className='loginForm'>
             <Form onSubmit={ handleSubmit }>

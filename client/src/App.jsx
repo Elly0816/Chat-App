@@ -8,6 +8,7 @@ import axios from 'axios';
 import Login from './components/Login';
 import Info from './components/Info';
 import People from './components/People';
+import Footer from './components/Footer';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 
@@ -111,6 +112,7 @@ function App() {
                                                   user={ user.user }/> : <Navigate to="/login" /> }/>}
           {user.auth && <Route path="/:request/:id" element={ <People setUser={ setUser } user={ user } endpoint={ endpoint }/> } />}
         </Routes>
+        {/* <Footer/> */}
       </Router>
     </div>
   );
