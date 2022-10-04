@@ -125,63 +125,67 @@ export default function Login(props){
         setForm({...form, [e.target.name]: e.target.value});
     }
 
-    return <div className='login'>
-        <Form onSubmit={ handleSubmit }>
+    return <div className='loginPage'>
+        <section className='loginSide'>
+            
+        </section>
+        <section className='loginForm'>
+            <Form onSubmit={ handleSubmit }>
+                { loginFailure && <div>
+                                <span className='error'>
+                                    Invalid username or password!
+                                </span>
+                            </div> }
 
-            { loginFailure && <div>
-                            <span className='error'>
-                                Invalid username or password!
-                            </span>
-                        </div> }
+                { register && <Form.Group className="mb-3" controlId="firstName">
+                    <Form.Label>First Name</Form.Label>
+                    <Form.Control onChange={handleChange} name='firstName' value={form.firstName} type="text" placeholder="Enter First Name" />
+                </Form.Group> }
 
-            { register && <Form.Group className="mb-3" controlId="firstName">
-                <Form.Label>First Name</Form.Label>
-                <Form.Control onChange={handleChange} name='firstName' value={form.firstName} type="text" placeholder="Enter First Name" />
-            </Form.Group> }
+                { register && <Form.Group className="mb-3" controlId="lastName">      
+                    <Form.Label>Last Name</Form.Label>
+                    <Form.Control onChange={handleChange} name='lastName' value={form.lastName} type="text" placeholder="Enter Last Name" />          
+                </Form.Group> }
 
-            { register && <Form.Group className="mb-3" controlId="lastName">      
-                <Form.Label>Last Name</Form.Label>
-                <Form.Control onChange={handleChange} name='lastName' value={form.lastName} type="text" placeholder="Enter Last Name" />          
-            </Form.Group> }
+                <Form.Group className="mb-3" controlId="Email">
+                    <Form.Label>Email address</Form.Label>
+                    <Form.Control onChange={handleChange} name='email' value={form.email} type="email" placeholder="Enter email" />
+                    <Form.Text className="text-muted">
+                    We'll never share your email with anyone else.
+                    </Form.Text>
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="Email">
-                <Form.Label>Email address</Form.Label>
-                <Form.Control onChange={handleChange} name='email' value={form.email} type="email" placeholder="Enter email" />
-                <Form.Text className="text-muted">
-                We'll never share your email with anyone else.
-                </Form.Text>
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="Password">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control onChange={handleChange} name='password' value={form.password} type="password" placeholder="Password" />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="Password">
-                <Form.Label>Password</Form.Label>
-                <Form.Control onChange={handleChange} name='password' value={form.password} type="password" placeholder="Password" />
-            </Form.Group>
+                { exists && <div>
+                                <span className='error'>
+                                    This User already exists. Login instead.
+                                </span>
+                            </div> }
 
-            { exists && <div>
-                            <span className='error'>
-                                This User already exists. Login instead.
-                            </span>
-                        </div> }
+                { register && <Form.Group className="mb-3" controlId="Password2">
+                    <Form.Label>Password</Form.Label>
+                        <Form.Control onChange={handleChange} name='password2' value={form.password2} type="password" placeholder="Enter your password again" />
+                        { !passwordSame && <span className="error">Passwords do not match!</span>}
+                </Form.Group> }
 
-            { register && <Form.Group className="mb-3" controlId="Password2">
-                <Form.Label>Password</Form.Label>
-                    <Form.Control onChange={handleChange} name='password2' value={form.password2} type="password" placeholder="Enter your password again" />
-                    { !passwordSame && <span className="error">Passwords do not match!</span>}
-            </Form.Group> }
+                {/* <Form.Group className="mb-3" controlId="formBasicCheckbox">
+                    <Form.Check type="checkbox" label="Check me out" />
+                </Form.Group> */}
+                <Button variant="primary" type="submit">
+                    Submit
+                </Button>
+            </Form>
 
-            {/* <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                <Form.Check type="checkbox" label="Check me out" />
-            </Form.Group> */}
-            <Button variant="primary" type="submit">
-                Submit
-            </Button>
-        </Form>
-
-        <div className='form-action'>
-            <span>{ register ? 'Already Registered?' : 'Not Registered?' }</span>
-            <Button onClick={toggleForm} variant="link" type="submit">
-                    { register ? 'Login' : 'Register' }
-            </Button>
-        </div>
+            <div className='form-action'>
+                <span>{ register ? 'Already Registered?' : 'Not Registered?' }</span>
+                <Button onClick={toggleForm} variant="link" type="submit">
+                        { register ? 'Login' : 'Register' }
+                </Button>
+            </div>
+        </section>
     </div>
 }
