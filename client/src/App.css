@@ -17,7 +17,7 @@ h6 {
 }
 
 .header {
-    background-color: navy;
+    background-color: #0984e3;
     padding: 0.5em;
     color: white;
     display: flex;
@@ -28,22 +28,31 @@ h6 {
     display: grid;
     padding: 0.5%;
     min-height: 100vh;
+    max-width: 100vw;
 }
 
 .loginSide {
     grid-column-start: 1;
-    grid-column-end: 3;
-    background-color: blue;
+    grid-column-end: 2;
+    background-color: #0984e3;
     border-radius: 1em 1em;
     color: white;
-    padding: 1%;
+    padding: 2%;
+}
+
+.sideText {
+    width: 40%;
+    margin-top: 5em;
 }
 
 .loginForm {
-    grid-column-start: 3;
+    grid-column-start: 2;
     grid-column-end: 6;
-    padding: 1em 15%;
-    max-width: 70%;
+    /* padding: 2%; */
+    padding: 10% 20% 10% 20%;
+    justify-content: left;
+    text-align: left;
+    /* max-width: 70%; */
     /* min-height: 100vh; */
     /* background-color: blanchedalmond; */
     /* border-radius: 0 2em 2em 0; */
@@ -54,8 +63,6 @@ h6 {
     position: absolute;
     margin-bottom: 1em;
     bottom: 0;
-    justify-content: center;
-    text-align: center;
 }
 
 .title {
@@ -79,7 +86,7 @@ h6 {
 }
 
 .form-action {
-    margin-top: 30%;
+    margin-top: 20%;
     width: max-content;
 }
 

@@ -128,8 +128,11 @@ export default function Login(props){
 
     return <div className='loginPage'>
         <section className='loginSide'>
-            <h4>Welcome to Chat-App</h4>
+            <h4>Welcome to Hi-Chat!</h4>
             { register ? <h1> Sign Up </h1> : <h1> Login </h1>}
+            <div className='sideText'>
+                <p>Find your friends, make connections and send messages on Hi-Chat!</p>
+            </div>
             <Footer/>
         </section>
         <section className='loginForm'>
