@@ -16,6 +16,7 @@ const path = require('path');
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.set('trust proxy', 1)
 app.use(session({
     secret: process.env.SECRET,
     resave: false,
@@ -24,9 +25,8 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.set('trust proxy', 1)
 
-const url = process.env.NODE_ENV ? process.env.MONGO : "mongodb://localhost:27017/chatDB";
+const url = process.env.NODE_ENV === 'production' ? process.env.MONGO : "mongodb://localhost:27017/chatDB";
 
 
 
@@ -209,6 +209,7 @@ io.on('connection', (socket) => {
 
     /*This searches the database for a matching username */
     socket.on('search', (arg) => {
+        console.log(arg, 'is what is in the search box');
         const regex = new RegExp(arg, 'i');
         User.find({ fullName: { $regex: regex } }, (err, users) => {
             if (err) {
@@ -218,6 +219,7 @@ io.on('connection', (socket) => {
                     socket.emit('search', 'No users found');
                 } else {
                     socket.emit('search', users);
+                    console.log(users);
                 }
             }
         });

@@ -19,7 +19,7 @@ function App() {
   const development = 'http://localhost:5000/';
   const production = 'https://full-chat-app.herokuapp.com/';
 
-  const endpoint = process.env.NODE_ENV ? production : development;
+  const endpoint = process.env.NODE_ENV === 'production' ? production : development;
 
 
   const [ socket, setSocket ] = useState();
