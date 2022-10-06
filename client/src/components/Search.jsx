@@ -47,7 +47,7 @@ export default function Search(props){
         <X onClick={props.close} style={{fontSize: '300%'}}/>
         { users.length > 0 && <datalist id='search-results'>
             { users.map(user => {
-                return <option key={user._id}>{user.username}</option>
+                return <option key={user._id}>{user.firstName + " " + user.lastName}</option>
             })}
         </datalist> }
       </Form>

@@ -24,6 +24,22 @@ h6 {
     width: 100%;
 }
 
+.dropdown-container {
+    text-align: left;
+    border: 1px solid #ccc;
+    position: relative;
+    border-radius: 5px;
+    margin: auto 0 auto auto;
+}
+
+.dropdown-input {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+}
+
 .loginPage {
     display: grid;
     padding: 0.5%;

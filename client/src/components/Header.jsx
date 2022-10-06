@@ -4,6 +4,7 @@ import Search from './Search';
 import { Search as SearchIcon } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Dropdown from './Dropdown';
 
 
 
@@ -38,27 +39,34 @@ export default function Header(props) {
 
 
     return <div className='header'>
-        <div className='title'>
-            <a href='/' style={{textDecoration: 'None', color:'white'}}><h2>HiChat!</h2></a>
-            { props.user.auth && <h6>Welcome {props.user.user.fullName}</h6>}
-        </div>
+                <div className='title'>
+                    <a href='/' style={{textDecoration: 'None', color:'white'}}><h2>HiChat!</h2></a>
+                    {/* { props.user.auth && <h6>Welcome {props.user.user.fullName}</h6>} */}
+                </div>
 
-        { props.user.auth && <div className='search'>
-                                { openSearch ? <Search
-                                                 socket={props.socket}
-                                                 close={toggleSearch}/> 
-                                : <div style={{display: 'flex',
-                                 justifyContent:'center',
-                                 padding:'20px'}} onClick={() => { setOpenSearch(true); }}>
-                                    <h6>Search</h6>
-                                    <SearchIcon style={{fontSize: "100%",
-                                    marginLeft: '20px'}}/>
-                                  </div> }
-                            </div> }
+                <div className='search'>
+                    { openSearch ? <Search
+                                        socket={props.socket}
+                                        close={toggleSearch}/> 
+                    : <div style={{display: 'flex',
+                        justifyContent:'center',
+                        padding:'10px'}} onClick={() => { setOpenSearch(true); }}>
+                        <h6>Search</h6>
+                        <SearchIcon style={{fontSize: "100%",
+                        marginLeft: '20px'}}/>
+                        </div> }
+                </div>
+
+                <Dropdown placeholder={props.user.user.fullName}
+                          profile={goToProfile}
+                          logout={logout}  
+                />
+
+
         
-        { props.user.auth && <div className='logout'>
+        {/* { props.user.auth && <div className='logout'>
             <Button variant="light" onClick={goToProfile}>Profile</Button>
             <Button className='button' variant="light" onClick={ logout }>Logout</Button>
-        </div> }
+        </div> } */}
     </div>
 }
