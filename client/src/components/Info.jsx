@@ -157,7 +157,7 @@ export default function Info(props){
         })
     }
 
-    return <div>
+    return <div className='infoPage'>
                     <h2>{profile.fullName}</h2>
                     <div className='info'>
                     <div className='info-1'>
@@ -193,7 +193,7 @@ export default function Info(props){
                             
                             {!requestSent && !connected && props.user.auth &&  !isUser && <Button type="button" onClick={sendRequest} disabled={reqDisabled} variant='primary'>{reqDisabled ? 'Request Sent' : 'Send Request'}</Button>}
                             {!requestSent && connected && !isUser && props.user.auth && <div>
-                                                                                            <Button style={{margin:"0.2em"}} type="button" onClick={removeConnection} variant='danger'>Remove from Connections</Button>
+                                                                                            <Button style={{margin:"0.2em"}} type="button" onClick={removeConnection} variant='danger'>Remove</Button>
                                                                                             <Button style={{margin:"0.2em"}} type="button" onClick={createChat} variant='primary'>Chat</Button>
                                                                                         </div>}    
                             {requestSent && !connected && props.user.auth &&  !isUser && <Button type="button" onClick={acceptRequest} variant='success'>Accept Request</Button>}
