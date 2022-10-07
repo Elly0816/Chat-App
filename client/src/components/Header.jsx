@@ -59,7 +59,8 @@ export default function Header(props) {
 
                 <Dropdown placeholder={props.user.user.fullName}
                           profile={goToProfile}
-                          logout={logout}  
+                          logout={logout}
+                          id={props.user.user._id}
                 />
 
 
