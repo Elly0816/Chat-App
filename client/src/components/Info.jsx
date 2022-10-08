@@ -157,7 +157,7 @@ export default function Info(props){
         })
     }
 
-    return <div className='infoPage'>
+    return <div className='infoPage not-header'>
                     <h2>{profile.fullName}</h2>
                     <div className='info'>
                     <div className='info-1'>

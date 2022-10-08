@@ -1,21 +1,60 @@
 import React from 'react';
-
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 
 
 export default function Chats(props){
 
+   const navigate = useNavigate;
 
-    return <div className='chats'>
-    { props.items?.map((item) =>  
-    <div onClick={
-                    () => {props.getMessages(item[1]._id, item[0].fullName);
-                            props.setId(item[1]._id);
-                            props.setUserId(item[0]._id)
-                            }
-                         } 
-                         className='chat-tile' 
-                         key={item[0]._id}>
-        <p><a style={{textDecoration: 'None', color: 'black'}} href={`/#/profile/${item[0]._id}`}>{item[0].fullName}</a></p><hr/>
-     </div> )}
+   const inside = {
+      color: "white",
+      backgroundColor: "#0984e3"
+   };
+
+   const outside = {
+      color: "black",
+      backgroundColor: "white"
+   };
+
+
+   const [ style, setStyle] = useState(outside);
+
+   // useEffect(() => {
+   //    setStyle(outside);
+   // }, []);
+
+   function mouseInside() {
+      setStyle(inside);
+   }
+
+   function mouseOutside(){
+      setStyle(outside);
+   }
+
+   return <div className='chats'>
+   <div className='chatshead'>
+   <h3>Chats</h3>
+   <h6>{props.items?.length} chats</h6>
+   </div>
+   { props.items?.map((item) =>  
+   <div key={item[0]._id} className='buttonContainer'>
+      <button onClick={
+                     () => {props.getMessages(item[1]._id, item[0].fullName);
+                              props.setId(item[1]._id);
+                              props.setUserId(item[0]._id);
+                              }
+                           } 
+                           className='chat-tile'
+                        onMouseEnter={mouseInside}
+                        onMouseLeave={mouseOutside} 
+                        styles={style}
+                        type='submit'>
+         <a href={`#/profile/${item[0]._id}`}><h6>
+            {item[0].fullName}</h6></a>
+      </button>
+      <hr/>
+   </div>
+    )}
 </div>
 }

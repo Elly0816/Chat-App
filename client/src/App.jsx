@@ -112,7 +112,7 @@ function App() {
                                                   user={ user.user }/> : <Navigate to="/login" /> }/>}
           {user.auth && <Route path="/:request/:id" element={ <People setUser={ setUser } user={ user } endpoint={ endpoint }/> } />}
         </Routes>
-        { user.auth && <Footer/>}
+        {/* { user.auth && <Footer/>} */}
       </Router>
     </div>
   );

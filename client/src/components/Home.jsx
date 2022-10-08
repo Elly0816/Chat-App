@@ -84,7 +84,7 @@ export default function Home(props){
         setCurrentChatId(id);
     }
 
-    return <div className='home'>
+    return <div className='home not-header'>
                     <Chats setUserId={setUserId} setId={setId} getMessages={getMessages} items={items}/>
                     {!messages ? <h5>Your chats are on the left. Click on one to view the messages.</h5> 
                     : <div className='message-container-container'><Messages deleteMessage={deleteMessage} userId={props.user._id} messages={messages}/>

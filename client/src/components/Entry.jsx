@@ -29,6 +29,6 @@ export default function Entry(props){
                 <Form.Control autoComplete='off' value={message} onChange={handleChange} rows={3} placeholder="Message"/>
             </Form.Group>
         </Form>
-        <Button onClick={handleSubmit} className='button' variant='success' type='submit' >Send</Button>
+        <Button onClick={handleSubmit} className='button' variant='primary' type='submit' >Send</Button>
     </div>
 }
