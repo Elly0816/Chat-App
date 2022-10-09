@@ -11,7 +11,7 @@ export default function Home(props){
     const [ items, setItems ] = useState();
     const [ messages, setMessages ] = useState();
     const [ currentChatId, setCurrentChatId ] = useState();
-    
+    const [ otherUserName, setOtherUserName ] = useState();    
     const [ otherUserId, setOtherUserId ] = useState();
 
     
@@ -85,9 +85,14 @@ export default function Home(props){
     }
 
     return <div className='home not-header'>
-                    <Chats setUserId={setUserId} setId={setId} getMessages={getMessages} items={items}/>
+                    <Chats setUserName={setOtherUserName} setUserId={setUserId} setId={setId} getMessages={getMessages} items={items}/>
                     {!messages ? <h5>Your chats are on the left. Click on one to view the messages.</h5> 
-                    : <div className='message-container-container'><Messages deleteMessage={deleteMessage} userId={props.user._id} messages={messages}/>
+                    : <div className='message-container-container'>
+                    <div><a href={`#/profile/${otherUserId}`} style={{
+                        textDecoration: 'None',
+                        color: 'black',
+                        width: 'min-content'}}><h6>{otherUserName}</h6></a></div>
+                    <Messages deleteMessage={deleteMessage} userId={props.user._id} messages={messages}/>
                         <Entry otherUserId={otherUserId} chatId={currentChatId} sendMessage={ props.sendMessage } userId={props.user._id}/>
             </div>}            
     </div>

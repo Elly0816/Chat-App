@@ -43,15 +43,14 @@ export default function Chats(props){
                      () => {props.getMessages(item[1]._id, item[0].fullName);
                               props.setId(item[1]._id);
                               props.setUserId(item[0]._id);
+                              props.setUserName(item[0].fullName)
                               }
                            } 
                            className='chat-tile'
-                        onMouseEnter={mouseInside}
-                        onMouseLeave={mouseOutside} 
-                        styles={style}
+
                         type='submit'>
-         <a href={`#/profile/${item[0]._id}`}><h6>
-            {item[0].fullName}</h6></a>
+         {/* <a href={`#/profile/${item[0]._id}`}></a> */}
+         <h6>{item[0].fullName}</h6>
       </button>
       <hr/>
    </div>

@@ -173,6 +173,12 @@ h6 {
     position: absolute;
     height: fit-content;
     border-radius: 5em;
+    color: #0984e3;
+}
+
+a {
+    text-decoration: none;
+    color: #0984e3;
 }
 
 .buttonContainer {
@@ -188,7 +194,8 @@ hr {
     background-color: #0984e3;
 }
 
-.chat-tile>a:hover {
+
+/* .chat-tile>a:hover {
     text-decoration: None;
     color: white;
     width: fit-content;
@@ -199,7 +206,7 @@ hr {
     color: #0984e3;
     display: block;
     width: fit-content;
-}
+} */
 
 .chat-tile:hover {
     background-color: #0984e3;

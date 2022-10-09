@@ -16,9 +16,10 @@ export default function Messages(props){
     }, [props.messages]);
 
    
+    // console.log(props);
 
-
-    return <div className='message-container' ref={messageContainer}>{props.messages.map((message, index) => <div key={index} className={message.sender.toString() === props.userId ? 'my-messages': 'other-messages'}>
+    return <div className='message-container' ref={messageContainer}>
+    {props.messages.map((message, index) => <div key={index} className={message.sender.toString() === props.userId ? 'my-messages': 'other-messages'}>
     <h6>{ message.text }</h6>
     <div className='message-bottom'>
         <p className='message-time'>{ new Date(message.time).getHours() }:{new Date(message.time).getMinutes()}:{new Date(message.time).getSeconds()}</p>
