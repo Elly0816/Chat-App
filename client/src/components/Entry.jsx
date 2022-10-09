@@ -14,12 +14,15 @@ export default function Entry(props){
 
     function handleSubmit(e){
         e.preventDefault();
-        props.sendMessage({message: message,
+        if (!(message && message.trim())){
+            //pass
+        } else {
+            props.sendMessage({message: message,
              chatId: props.chatId,
              senderId: props.userId,
             otherUserId: props.otherUserId});
-        setMessage("");
-
+            setMessage("");
+        }
     }
 
 

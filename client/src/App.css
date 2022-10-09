@@ -133,12 +133,12 @@ h6 {
 
 .entry-form {
     width: 85%;
-    height: max-content;
+    height: fit-content;
 }
 
 .entry .button {
     width: 15%;
-    height: min-content;
+    height: fit-content;
 }
 
 .home {

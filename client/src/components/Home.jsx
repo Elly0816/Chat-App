@@ -88,10 +88,9 @@ export default function Home(props){
                     <Chats setUserName={setOtherUserName} setUserId={setUserId} setId={setId} getMessages={getMessages} items={items}/>
                     {!messages ? <h5>Your chats are on the left. Click on one to view the messages.</h5> 
                     : <div className='message-container-container'>
-                    <div><a href={`#/profile/${otherUserId}`} style={{
+                    <div><h6 style={{width: 'fit-content'}}><a href={`#/profile/${otherUserId}`} style={{
                         textDecoration: 'None',
-                        color: 'black',
-                        width: 'min-content'}}><h6>{otherUserName}</h6></a></div>
+                        color: 'black'}}>{otherUserName}</a></h6></div>
                     <Messages deleteMessage={deleteMessage} userId={props.user._id} messages={messages}/>
                         <Entry otherUserId={otherUserId} chatId={currentChatId} sendMessage={ props.sendMessage } userId={props.user._id}/>
             </div>}            
