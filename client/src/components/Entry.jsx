@@ -14,13 +14,13 @@ export default function Entry(props){
 
     function handleSubmit(e){
         e.preventDefault();
-        if (!(message && message.trim())){
+        if (!(message && message.trim())){ //This does not allow just spaces to be sent
             //pass
         } else {
             props.sendMessage({message: message,
              chatId: props.chatId,
              senderId: props.userId,
-            otherUserId: props.otherUserId});
+             otherUserId: props.otherUserId});
             setMessage("");
         }
     }
