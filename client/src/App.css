@@ -11,8 +11,8 @@ h6 {
 .app {
     /* margin: 2em auto; */
     /* max-width: 50em; */
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     /* background-color: black; */
 }
 
@@ -21,13 +21,14 @@ h6 {
     padding: 0.5em;
     color: white;
     display: flex;
-    width: 100%;
-    min-height: 5vh;
+    /* width: 100vw; */
+    max-height: 7vh;
 }
 
-.not-header {
+
+/* .not-header {
     min-height: 95vh;
-}
+} */
 
 .dropdown-container {
     text-align: left;
@@ -48,8 +49,8 @@ h6 {
 .loginPage {
     display: grid;
     padding: 0.5%;
-    min-height: 100vh;
-    max-width: 100vw;
+    min-height: 100%;
+    max-width: 100%;
 }
 
 .loginSide {
@@ -92,6 +93,7 @@ h6 {
 
 .search {
     width: 33%;
+    /* max-height: 50%; */
 }
 
 .logout {
@@ -117,49 +119,62 @@ h6 {
     height: inherit;
 }
 
+.message-name {
+    height: 2.5%;
+}
+
 .message-container {
     margin: 0;
-    height: 80%;
-    ;
+    height: 91%;
     background-color: gray;
     padding: 0.25em 0.5em;
     overflow-y: scroll;
+    border: 1px solid #0984e3;
 }
 
 .entry {
     display: flex;
-    height: 20%;
+    height: 5%;
 }
 
 .entry-form {
-    width: 85%;
-    height: fit-content;
+    width: 90%;
 }
 
 .entry .button {
-    width: 15%;
-    height: fit-content;
+    /* width: 10%; */
+    border-radius: 100%;
+    margin-left: auto;
+    background-color: #0984e3;
+}
+
+.entry .button:hover {
+    background-color: white;
+    color: #0984e3;
 }
 
 .home {
     display: flex;
+    max-height: 93vh;
     min-height: 93vh;
-    height: 93vh;
+    ;
+    /* height: 95vh; */
 }
 
-.chatshead {
+
+/* .chatshead {
     justify-content: space-between;
-}
+} */
 
-.chathead>h6 {
+
+/* .chathead>h6 {
     color: gray;
-}
+} */
 
 .chats {
     width: 25%;
     font-size: 0.8em;
     min-height: 100%;
-    height: 100%;
     overflow-y: scroll;
     padding: 1em;
 }
@@ -257,6 +272,7 @@ hr {
 
 .infoPage {
     padding: 5%;
+    width: 100vw;
 }
 
 .infoPage h2 {
