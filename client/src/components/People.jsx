@@ -3,12 +3,17 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import lodash from 'lodash';
+import Form from 'react-bootstrap/Form';
 
 export default function People(props){
 
     const [ people, setPeople ] = useState();
 
     const [ title, setTitle ] = useState();
+
+    const [toShow, setToShow ] = useState();
+
+    const [ filter, setFilter ] = useState();
 
     const { id, request } = useParams();
 
@@ -91,12 +96,37 @@ export default function People(props){
                 break
                 
         }
-    }
+    };
+
+    useEffect(() => {
+        setToShow(people);
+    }, [people])
+
+
+    function handleChange(e){
+        setFilter(e.target.value);
+        if (e.target.value.length > 0){
+            let filteredPeople = people.filter(user => user.fullName.toLowerCase().includes(e.target.value.toLowerCase()));
+            setToShow(filteredPeople);
+        } else {
+            setToShow(people);
+        }
+    };
 
     return <div className='people'>
+        
         <h2>{ title }</h2>
         <hr/>
-        { people && people.map(person => <div style={{display:'grid', margin: '10px', gridAutoColumns: '3fr', gridAutoFlow: 'column'}} key={person._id} className='person'>
+        {/*When text is typed in the form, the target username is filtered from the names on the page*/}
+        <Form style={{width: '60%'}}>
+            <Form.Control value={filter} 
+                          onChange={handleChange}
+                          type='text'
+                          placeholder='search for a name...'  
+                          />
+        </Form>
+        <hr/>
+        { toShow && toShow.map(person => <div style={{display:'grid', margin: '10px', gridAutoColumns: '3fr', gridAutoFlow: 'column'}} key={person._id} className='person'>
         <a style={{textDecoration:'none', color:'black'}} href={`/#/profile/${person._id}`}><h5>{ person.fullName}</h5></a>
         {title==='Pending Requests' && <Button
          onClick={() => handleClick(person._id, 'cancel sent request')} 

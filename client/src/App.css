@@ -21,8 +21,7 @@ h6 {
     padding: 0.5em;
     color: white;
     display: flex;
-    /* width: 100vw; */
-    max-height: 7vh;
+    height: 7vh;
 }
 
 
@@ -157,10 +156,9 @@ h6 {
 
 .home {
     display: flex;
-    max-height: 93vh;
-    min-height: 93vh;
-    ;
-    /* height: 95vh; */
+    max-height: 92vh;
+    min-height: 92vh;
+    max-width: 100vw;
 }
 
 
@@ -298,4 +296,8 @@ hr {
 .chat-tile {
     border-width: 2px;
     color: black;
+}
+
+.people {
+    padding: 2%;
 }
