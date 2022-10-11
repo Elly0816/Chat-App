@@ -1,43 +1,50 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import Form from 'react-bootstrap/Form';
 
 
 export default function Chats(props){
 
-   const navigate = useNavigate;
+  const [chats, setChats] = useState();
 
-   const inside = {
-      color: "white",
-      backgroundColor: "#0984e3"
-   };
+  const [toShow, setToShow] = useState();
+  
+  const [filter, setFilter] = useState();
+  
+  useEffect(() => {
+   setChats(props.items)
+  });
 
-   const outside = {
-      color: "black",
-      backgroundColor: "white"
-   };
-
-
-   const [ style, setStyle] = useState(outside);
-
-   // useEffect(() => {
-   //    setStyle(outside);
-   // }, []);
-
-   function mouseInside() {
-      setStyle(inside);
+  useEffect(() => {
+   setToShow(chats);
+  }, [chats])
+  
+  
+  function handleChange(e){
+   setFilter(e.target.value);
+   if (e.target.value.length > 0){
+      let filteredNames = chats.filter(item => item[0].fullName.toLowerCase().includes(e.target.value.toLowerCase()));
+      setToShow(filteredNames);
+   } else {
+      setToShow(chats);
    }
+  }
 
-   function mouseOutside(){
-      setStyle(outside);
-   }
 
-   return <div className='chats'>
+  return <div className='chats'>
    <div className='chatshead'>
    <h3>Chats</h3>
-   <h6>{props.items?.length} chats</h6>
+   <h6>{chats?.length} chats</h6>
    </div>
-   { props.items?.map((item) =>  
+   <div>
+      <Form>
+         <Form.Control value={filter}
+                       placeholder='search for a name...'
+                       onChange={handleChange} 
+                       />
+      </Form>
+   </div>
+   { toShow?.map((item) =>  
    <div key={item[0]._id} className='buttonContainer'>
       <hr/>
       <button onClick={

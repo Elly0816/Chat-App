@@ -92,7 +92,15 @@ h6 {
 
 .search {
     width: 33%;
-    /* max-height: 50%; */
+}
+
+.searchForm {
+    height: 100%;
+}
+
+.X {
+    font-size: 250%;
+    margin: auto;
 }
 
 .logout {

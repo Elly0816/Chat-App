@@ -33,7 +33,7 @@ export default function Search(props){
     }
 
 
-    return <Form className="d-flex" onSubmit={handleSubmit}>
+    return <Form className="d-flex searchForm" onSubmit={handleSubmit}>
         <Form.Control
           autoFocus={true} 
           onChange={handleChange}
@@ -44,7 +44,7 @@ export default function Search(props){
           value={search}
           list="search-results"
         />
-        <X onClick={props.close} style={{fontSize: '300%'}}/>
+        <X className='X' onClick={props.close}/>
         { users.length > 0 && <datalist id='search-results'>
             { users.map(user => {
                 return <option key={user._id}>{user.firstName + " " + user.lastName}</option>

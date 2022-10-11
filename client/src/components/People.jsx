@@ -122,7 +122,7 @@ export default function People(props){
             <Form.Control value={filter} 
                           onChange={handleChange}
                           type='text'
-                          placeholder='search for a name...'  
+                          placeholder={`search for the name of a ${request}...`}  
                           />
         </Form>
         <hr/>
