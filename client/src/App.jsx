@@ -12,6 +12,7 @@ import Footer from './components/Footer';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 
+
 function App() {
 
   let sendMessage;

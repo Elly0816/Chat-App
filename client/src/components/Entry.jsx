@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import { ArrowRight } from 'react-bootstrap-icons';
 
 
 
@@ -32,6 +33,6 @@ export default function Entry(props){
                 <Form.Control autoComplete='off' value={message} onChange={handleChange} rows={3} placeholder="Message"/>
             </Form.Group>
         </Form>
-        <Button onClick={handleSubmit} className='button' variant='primary' type='submit' >Send</Button>
+        <Button onClick={handleSubmit} className='button' variant='primary' type='submit' ><ArrowRight/></Button>
     </div>
 }
