@@ -34,7 +34,8 @@ export default function Chats(props){
   return <div className='chats'>
    <div className='chatshead'>
    <h3>Chats</h3>
-   <h6>{chats?.length} chats</h6>
+   {/* <h6>{chats?.length}</h6>{chats?.length > 1? <h6>chats</h6> : <h6>chat</h6>} */}
+   {chats?.length > 1 ? <h6>{chats.length} chats</h6> : <h6>{chats.length} chat</h6>}
    </div>
    <div>
       <Form>
