@@ -3,6 +3,8 @@ import Entry from './Entry';
 import axios from 'axios';
 import Messages from './Messages';
 import Chats from './Chats';
+import { appContext } from '../App';
+import { useContext } from 'react';
 
 
 export default function Home(props){
@@ -14,12 +16,12 @@ export default function Home(props){
     const [ otherUserName, setOtherUserName ] = useState();    
     const [ otherUserId, setOtherUserId ] = useState();
 
-    
+    const {socket, user, endpoint } = useContext(appContext);
 
     useEffect(()=>{
         async function getChats(){
-            //console.log(`${props.endpoint}chats/${props.user._id}`);
-            await axios.get(`${props.endpoint}api/chats/${props.user._id}`)
+            //console.log(`${endpoint}chats/${user.user._id}`);
+            await axios.get(`${endpoint}api/chats/${user.user._id}`)
             .then(response => {
                 //console.log(response.data);
                 const chats = response.data.chats;
@@ -39,14 +41,14 @@ export default function Home(props){
     }
 
     //Socket passed down from app
-    if(props.socket){
-        props.socket.on('receive', (arg) => {
+    if(socket){
+        socket.on('receive', (arg) => {
             //console.log(arg);
             setMessages(arg);
             // setMessages([...messages, arg])
         
 
-        props.socket.on('deleted', (arg) => {
+        socket.on('deleted', (arg) => {
             //console.log(arg);
             setMessages(arg);
         })
@@ -56,8 +58,8 @@ export default function Home(props){
 
     //Delete message
     function deleteMessage(id){
-        if(props.socket){
-            props.socket.emit('delete', {id: id,
+        if(socket){
+            socket.emit('delete', {id: id,
                  otherUser: otherUserId,
                 chatId: currentChatId});
         }
@@ -66,7 +68,7 @@ export default function Home(props){
 
     //This initally loads up the messages chat from the database
     function getMessages(id, otherUserName) {
-        axios.get(`${props.endpoint}api/messages/${id}`)
+        axios.get(`${endpoint}api/messages/${id}`)
         .then(response => {
             if (!response.data.messages){
                 //console.log(response.data);
@@ -91,8 +93,8 @@ export default function Home(props){
                     <div className='message-name'><h6 style={{width: 'fit-content'}}><a href={`#/profile/${otherUserId}`} style={{
                         textDecoration: 'None',
                         color: '#984e3'}}>{otherUserName}</a></h6></div>
-                    <Messages deleteMessage={deleteMessage} userId={props.user._id} messages={messages}/>
-                        <Entry otherUserId={otherUserId} chatId={currentChatId} sendMessage={ props.sendMessage } userId={props.user._id}/>
+                    <Messages deleteMessage={deleteMessage} userId={user.user._id} messages={messages}/>
+                        <Entry otherUserId={otherUserId} chatId={currentChatId} sendMessage={ props.sendMessage } userId={user.user._id}/>
             </div>}            
     </div>
 } 
