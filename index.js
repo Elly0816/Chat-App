@@ -195,7 +195,7 @@ io.on('connection', (socket) => {
                                         const socketId = user.socketId;
                                         io.to(socketId).emit('receive', msgs);
                                         socket.emit('receive', msgs);
-
+                                        io.to(socketId).emit('play');
                                     }
                                 })
                             }

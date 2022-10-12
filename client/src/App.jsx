@@ -27,7 +27,6 @@ function App() {
 
   const [ user, setUser ] = useState({auth: null, user: {}});
 
-
   
   /*This checks if a user has previously logged in */
   useEffect(() => {
@@ -85,6 +84,12 @@ function App() {
 
   function authenticate(status){
    setUser(status);
+  };
+
+  if (socket){
+    socket.on('play', () => {
+      new Audio('sounds/new message notification.wav').play();
+    });
   }
 
 

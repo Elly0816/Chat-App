@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { X } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router';
+import { useContext } from 'react';
+import { appContext } from '../App';
+
 
 export default function Search(props){
 
@@ -9,12 +12,14 @@ export default function Search(props){
 
     const [ users, setUsers ] = useState([]);
 
+    const {socket, user, endpoint} = useContext(appContext);
+
 /*Searches the database for the users matching the input in the form via websocket */
     function handleChange(e){
         setSearch(e.target.value);
         async function listenforUsers(){
-            props.socket.emit('search', search);
-            await props.socket.on('search', (arg) => {
+            socket.emit('search', search);
+            await socket.on('search', (arg) => {
                 setUsers(arg);
             });
         }
