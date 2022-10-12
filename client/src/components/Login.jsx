@@ -4,9 +4,12 @@ import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import Footer from './Footer';
 import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { appContext } from '../App';
 
 export default function Login(props){
 
+    const {socket, user, endpoint} = useContext(appContext);
 
     const navigate = useNavigate();
 
@@ -53,7 +56,7 @@ export default function Login(props){
         if (register){
             const { firstName, lastName, email, password, password2 } = form;
             if ( password === password2 ){
-                await axios.post(`${props.endpoint}api/register`, {
+                await axios.post(`${endpoint}api/register`, {
                     firstName: firstName,
                     lastName: lastName,
                     email: email,
@@ -87,7 +90,7 @@ export default function Login(props){
         else {
             /*This handles login */
             const { email, password } = form;
-            await axios.post(`${props.endpoint}api/login`, {
+            await axios.post(`${endpoint}api/login`, {
                 email: email,
                 password: password
             })

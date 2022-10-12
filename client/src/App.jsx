@@ -87,11 +87,6 @@ function App() {
    setUser(status);
   }
 
-  // /*This changes the user.user whenever the user edits their account */
-  // function newUser(user){
-  //   setUser(user);
-  // }
-
 
   return (
     <div className='app'>
@@ -99,14 +94,9 @@ function App() {
         <appContext.Provider value={{socket, user, endpoint}}>
           { user.auth && <Header logout={ authenticate }/>}
           <Routes>
-            {/* { user.auth ? <Route path="/profile/:id" element={ <Info endpoint={endpoint}/> }/> :
-              <Navigate to="/login"/>} */}
-            {/* <Route path="/profile/:id" element={user.auth ? <Info endpoint={ endpoint } /> :
-                                    <Navigate to='/login'/>} /> */}
             <Route path="/profile/:id" element={<Info changeUser={ authenticate } /> } />
             <Route path="/login" element={ 
-              !user.auth ? <Login endpoint={ endpoint }
-                                  authenticate={ authenticate }/> : <Navigate to="/" /> } />
+              !user.auth ? <Login authenticate={ authenticate }/> : <Navigate to="/" /> } />
             {user.auth !== null && <Route path="/" element={ user.auth ? <Home
                                                             sendMessage={ sendMessage } /> : <Navigate to="/login" /> }/>}
             {user.auth && <Route path="/:request/:id" element={ <People setUser={ setUser } user={ user } endpoint={ endpoint }/> } />}
