@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import lodash from 'lodash';
 import Form from 'react-bootstrap/Form';
+import { appContext } from '../App';
 
 export default function People(props){
 
@@ -19,10 +20,12 @@ export default function People(props){
 
     const navigate = useNavigate();
 
+    const {socket, user, endpoint} = useContext(appContext);
+
     useEffect(() => {
         async function getPeople(){
             if (request !== 'pendingRequests') {
-                await axios.get(`${props.endpoint}api/${request}/${id}`)
+                await axios.get(`${endpoint}api/${request}/${id}`)
                 .then(response => 
                 {   
                     setTitle(`${lodash.capitalize(request)}s`);
@@ -32,7 +35,7 @@ export default function People(props){
                 )
                 .catch(err => console.log(err));
             } else {
-                await axios.get(`${props.endpoint}api/request/${id}`)
+                await axios.get(`${endpoint}api/request/${id}`)
                 .then(response => 
                 {   setTitle('Pending Requests');
                     setPeople(response.data.pending);
@@ -44,48 +47,48 @@ export default function People(props){
             
         }
         getPeople();
-    }, [id, request, props.user, props.endpoint]);
+    }, [id, request, user, endpoint]);
 
     function handleClick(id, todo){
         switch (todo) {
             case "cancel sent request" :
-                axios.patch(`${props.endpoint}api/pending-requests/${props.user.user._id}`, {id: id})
+                axios.patch(`${endpoint}api/pending-requests/${user.user._id}`, {id: id})
                 .then(response => {
-                props.setUser({...props.user, user: response.data.user})
+                props.setUser({...user, user: response.data.user})
                 setPeople(people.filter((person) => person._id !== id));
-                navigate(`/profile/${props.user.user._id}`);
+                navigate(`/profile/${user.user._id}`);
                 })
                 .catch(err => console.log(err));
                 break
             case "decline request":
-                axios.patch(`${props.endpoint}request/${props.user.user._id}`, {id: id})
+                axios.patch(`${endpoint}request/${user.user._id}`, {id: id})
                 .then(response => {
-                props.setUser({...props.user, user: response.data.user})
+                props.setUser({...user, user: response.data.user})
                 setPeople(people.filter((person) => person._id !== id));
-                navigate(`/profile/${props.user.user._id}`);
+                navigate(`/profile/${user.user._id}`);
                 })
                 .catch(err => console.log(err));
                 break
             case "accept request":
-                axios.post(`${props.endpoint}api/connection/${props.user.user._id}`, {id: id})
+                axios.post(`${endpoint}api/connection/${user.user._id}`, {id: id})
                 .then(response => {
-                props.setUser({...props.user, user: response.data.user})
+                props.setUser({...user, user: response.data.user})
                 setPeople(people.filter((person) => person._id !== id));
-                navigate(`/profile/${props.user.user._id}`);
+                navigate(`/profile/${user.user._id}`);
                 })
                 .catch(err => console.log(err));
                 break
             case "remove connection":
-                axios.patch(`${props.endpoint}api/connection/${props.user.user._id}`, {id: id})
+                axios.patch(`${endpoint}api/connection/${user.user._id}`, {id: id})
                 .then(response => {
-                    props.setUser({...props.user, user: response.data.user})
+                    props.setUser({...user, user: response.data.user})
                     setPeople(people.filter(person => person._id !== id));
-                    navigate(`/profile/${props.user.user._id}`);
+                    navigate(`/profile/${user.user._id}`);
                 })
                 .catch(err => console.log(err));
                 break
             case "create chat":
-                axios.get(`${props.endpoint}api/chat/${props.user.user._id}/${id}`)
+                axios.get(`${endpoint}api/chat/${user.user._id}/${id}`)
                 .then(response => {
                     navigate('/');
                 })
@@ -139,7 +142,7 @@ export default function People(props){
                                     onClick={() => handleClick(person._id, 'decline request')}
                                     style={{margin: '0 10px'}} variant='danger'>Decline</Button>
                                  </div>}
-        {props.user.user._id === id && title === 'Connections' && <div>
+        {user.user._id === id && title === 'Connections' && <div>
                                                                     <Button 
                                                                     onClick={() => handleClick(person._id, 'remove connection')} 
                                                                     style={{margin: '0 10px'}} variant='danger'>Remove Connection
