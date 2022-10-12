@@ -3,6 +3,9 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
+import { appContext } from '../App';
+import { useContext } from 'react';
+
 
 
 export default function Info(props){
@@ -26,18 +29,20 @@ export default function Info(props){
     //Keeps track on if the profile user sent a request
     const [ requestSent, setRequestSent ] = useState(false);
 
+    const {socket, user, endpoint} = useContext(appContext);
+
 
     /*This gets the details of the user whose id matches the id of use params */
     useEffect(() => {
         async function getDetails(){
-            await axios.get(`${props.endpoint}api/profile/${id}`)
+            await axios.get(`${endpoint}api/profile/${id}`)
             .then( response => {
                 //console.log(response.data.response);
                 setProfile(response.data.response);
                 console.log(`The id is: ${id}`);
-                if (id === props.user.user._id){
+                if (id === user.user._id){
                     setIsUser(true);
-                    props.changeUser({...props.user, user: response.data.response});
+                    props.changeUser({...user.user, auth: user.auth, user: response.data.response});
                 } else {
                     setIsUser(false);
                 }
@@ -55,18 +60,18 @@ export default function Info(props){
     //useEffect to change buttons that show on the page
     useEffect(() => {
         if(profile._id){
-            if ((profile.connections.includes(props.user.user._id)) || 
-            (profile.requests.includes(props.user.user._id))) {
+            if ((profile.connections.includes(user.user._id)) || 
+            (profile.requests.includes(user.user._id))) {
             setReqDisabled(true);
             } else {
                 setReqDisabled(false);
             }
-            if (profile.connections.includes(props.user.user._id)) {
+            if (profile.connections.includes(user.user._id)) {
                 setConnected(true);
             } else {
                 setConnected(false);
             }
-            if (profile.pendingRequests.includes(props.user.user._id)){
+            if (profile.pendingRequests.includes(user.user._id)){
                 setRequestSent(true);
             } else {
                 setRequestSent(false);
@@ -81,7 +86,7 @@ export default function Info(props){
         //console.log('submit clicked');
         e.preventDefault();
         function changeDetails(){
-            axios.patch(`${props.endpoint}api/profile/${id}`, {
+            axios.patch(`${endpoint}api/profile/${id}`, {
                 firstName: profile.firstName,
                 lastName: profile.lastName,
                 fullName: `${profile.firstName} ${profile.lastName}`,
@@ -89,7 +94,7 @@ export default function Info(props){
             })
             .then( response => {
                 //console.log(response.data.response);
-                props.changeUser({...props.user, user: response.data.response});
+                props.changeUser({...user.user, user: response.data.response});
             })
             .catch(err => {
                 console.log(err);
@@ -108,10 +113,10 @@ export default function Info(props){
     /*Function to send requests to another user*/
     function sendRequest(e){
         async function requestSender(){
-            await axios.post(`${props.endpoint}api/request/${props.user.user._id}`, {id: id})
+            await axios.post(`${endpoint}api/request/${user.user._id}`, {id: id})
             .then( response => {
                 //console.log(response);
-                props.changeUser({...props.user, user: response.data.user});
+                props.changeUser({...user.user, user: response.data.user});
                 setReqDisabled(true);
             })
             .catch(err => console.log(err));
@@ -125,9 +130,9 @@ export default function Info(props){
 
     function acceptRequest(){
         async function accept(){
-            axios.post(`${props.endpoint}api/connection/${props.user.user._id}`, {id: id})
+            axios.post(`${endpoint}api/connection/${user.user._id}`, {id: id})
                 .then(response => {
-                props.changeUser({...props.user, user: response.data.user})
+                props.changeUser({...user.user, user: response.data.user})
                 setConnected(true);
                 })
                 .catch(err => console.log(err));
@@ -137,11 +142,11 @@ export default function Info(props){
 
     function removeConnection(){
         async function remove(){
-            axios.patch(`${props.endpoint}api/connection/${props.user.user._id}`, {id: id})
+            axios.patch(`${endpoint}api/connection/${user.user._id}`, {id: id})
                 .then(response => {
-                    props.changeUser({...props.user, user: response.data.user})
+                    props.changeUser({...user.user, user: response.data.user})
                     setConnected(false);
-                    profile.connections.filter(connection => connection !== props.user.user._id);
+                    profile.connections.filter(connection => connection !== user.user._id);
                 })
                 .catch(err => console.log(err));
         }
@@ -150,7 +155,7 @@ export default function Info(props){
     
     //Creates or returns chat between two users
     function createChat(){
-        axios.get(`${props.endpoint}api/chat/${props.user.user._id}/${profile._id}`)
+        axios.get(`${endpoint}api/chat/${user.user._id}/${profile._id}`)
         .then(response => {
             //console.log(response);
             navigate("/");
@@ -188,15 +193,15 @@ export default function Info(props){
 
                             { isUser && <div onClick={ () => getRequests('pendingRequests') }>
                                 <span>Pending Requests:</span>
-                                <h6>{ props.user.user.pendingRequests.length }</h6>
+                                <h6>{ user.user.pendingRequests.length }</h6>
                             </div> }
                             
-                            {!requestSent && !connected && props.user.auth &&  !isUser && <Button type="button" onClick={sendRequest} disabled={reqDisabled} variant='primary'>{reqDisabled ? 'Request Sent' : 'Send Request'}</Button>}
-                            {!requestSent && connected && !isUser && props.user.auth && <div>
+                            {!requestSent && !connected && user.auth &&  !isUser && <Button type="button" onClick={sendRequest} disabled={reqDisabled} variant='primary'>{reqDisabled ? 'Request Sent' : 'Send Request'}</Button>}
+                            {!requestSent && connected && !isUser && user.auth && <div>
                                                                                             <Button style={{margin:"0.2em"}} type="button" onClick={removeConnection} variant='danger'>Remove</Button>
                                                                                             <Button style={{margin:"0.2em"}} type="button" onClick={createChat} variant='primary'>Chat</Button>
                                                                                         </div>}    
-                            {requestSent && !connected && props.user.auth &&  !isUser && <Button type="button" onClick={acceptRequest} variant='success'>Accept Request</Button>}
+                            {requestSent && !connected && user.auth &&  !isUser && <Button type="button" onClick={acceptRequest} variant='success'>Accept Request</Button>}
                         </div>  
 
                     </div>
