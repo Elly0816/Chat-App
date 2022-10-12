@@ -41,27 +41,28 @@ export default function Chats(props){
       <Form>
          <Form.Control value={filter}
                        placeholder='search for a name...'
-                       onChange={handleChange} 
-                       />
+                       onChange={handleChange} />
       </Form>
    </div>
-   { toShow?.map((item) =>  
-   <div key={item[0]._id} className='buttonContainer'>
-      <hr/>
-      <button onClick={
-                     () => {props.getMessages(item[1]._id, item[0].fullName);
-                              props.setId(item[1]._id);
-                              props.setUserId(item[0]._id);
-                              props.setUserName(item[0].fullName)
-                              }
-                           } 
-                           className='chat-tile'
+   <div className='buttons'>
+      { toShow?.map((item) =>  
+      <div key={item[0]._id} className='buttonContainer'>
+         <hr/>
+         <button onClick={
+                        () => {props.getMessages(item[1]._id, item[0].fullName);
+                                 props.setId(item[1]._id);
+                                 props.setUserId(item[0]._id);
+                                 props.setUserName(item[0].fullName)
+                                 }
+                              } 
+                              className='chat-tile'
 
-                        type='submit'>
-         {/* <a href={`#/profile/${item[0]._id}`}></a> */}
-         <h6>{item[0].fullName}</h6>
-      </button>
+                           type='submit'>
+            {/* <a href={`#/profile/${item[0]._id}`}></a> */}
+            <h6>{item[0].fullName}</h6>
+         </button>
+      </div>
+      )}
    </div>
-    )}
 </div>
 }
