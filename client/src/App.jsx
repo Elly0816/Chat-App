@@ -97,13 +97,13 @@ function App() {
     <div className='app'>
       <Router>
         <appContext.Provider value={{socket, user, endpoint}}>
-          { user.auth && <Header endpoint={endpoint} logout={ authenticate } user={ user } socket={ socket }/>}
+          { user.auth && <Header logout={ authenticate }/>}
           <Routes>
             {/* { user.auth ? <Route path="/profile/:id" element={ <Info endpoint={endpoint}/> }/> :
               <Navigate to="/login"/>} */}
             {/* <Route path="/profile/:id" element={user.auth ? <Info endpoint={ endpoint } /> :
                                     <Navigate to='/login'/>} /> */}
-            <Route path="/profile/:id" element={<Info changeUser={ authenticate } user={ user } endpoint={ endpoint } /> } />
+            <Route path="/profile/:id" element={<Info changeUser={ authenticate } /> } />
             <Route path="/login" element={ 
               !user.auth ? <Login endpoint={ endpoint }
                                   authenticate={ authenticate }/> : <Navigate to="/" /> } />
