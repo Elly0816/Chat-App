@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 
 
+
 export default function Chats(props){
 
   const [chats, setChats] = useState();
@@ -10,6 +11,7 @@ export default function Chats(props){
   const [toShow, setToShow] = useState();
   
   const [filter, setFilter] = useState();
+
   
   useEffect(() => {
    setChats(props.items)
@@ -52,7 +54,7 @@ export default function Chats(props){
                         () => {props.getMessages(item[1]._id, item[0].fullName);
                                  props.setId(item[1]._id);
                                  props.setUserId(item[0]._id);
-                                 props.setUserName(item[0].fullName)
+                                 props.setUserName(item[0].fullName);
                                  }
                               } 
                               className='chat-tile'

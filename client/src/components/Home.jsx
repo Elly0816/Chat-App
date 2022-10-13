@@ -5,6 +5,7 @@ import Messages from './Messages';
 import Chats from './Chats';
 import { appContext } from '../App';
 import { useContext } from 'react';
+import { createContext } from 'react';
 
 
 export default function Home(props){
@@ -43,10 +44,13 @@ export default function Home(props){
     //Socket passed down from app
     if(socket){
         socket.on('receive', (arg) => {
-            //console.log(arg);
-            setMessages(arg);
-            // setMessages([...messages, arg])
-        
+            let lastMessage = arg[arg.length -1];
+            // console.log(arg[arg.length -1]);
+            if (otherUserId === lastMessage.sender || user.user._id === lastMessage.sender){
+                setMessages(arg);
+                // setMessages([...messages, arg])
+            };
+
 
         socket.on('deleted', (arg) => {
             //console.log(arg);
@@ -87,14 +91,19 @@ export default function Home(props){
     }
 
     return <div className='home not-header'>
-                    <Chats setUserName={setOtherUserName} setUserId={setUserId} setId={setId} getMessages={getMessages} items={items}/>
-                    {!messages ? <h5>Your chats are on the left. Click on one to view the messages.</h5> 
-                    : <div className='message-container-container'>
+                <Chats setUserName={setOtherUserName}
+                        setUserId={setUserId}
+                        setId={setId}
+                        getMessages={getMessages}
+                        items={items}/>
+                {!messages ? <h5>Your chats are on the left. Click on one to view the messages.</h5> 
+                : <div className='message-container-container'>
                     <div className='message-name'><h6 style={{width: 'fit-content'}}><a href={`#/profile/${otherUserId}`} style={{
-                        textDecoration: 'None',
-                        color: '#984e3'}}>{otherUserName}</a></h6></div>
+                    textDecoration: 'None',
+                    color: '#984e3'}}>{otherUserName}</a></h6></div>
                     <Messages deleteMessage={deleteMessage} userId={user.user._id} messages={messages}/>
-                        <Entry otherUserId={otherUserId} chatId={currentChatId} sendMessage={ props.sendMessage } userId={user.user._id}/>
-            </div>}            
+                    <Entry otherUserId={otherUserId} chatId={currentChatId} sendMessage={ props.sendMessage } userId={user.user._id}/>
+                </div>}            
     </div>
 } 
+
