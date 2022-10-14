@@ -54,7 +54,8 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 const messageSchema = new mongoose.Schema({
     text: String,
     sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    time: { type: Date, default: Date.now }
+    time: { type: Date, default: Date.now },
+    chatId: { type: mongoose.Schema.Types.ObjectId, ref: 'Chat' },
 });
 
 /*Schema for chats*/
@@ -172,7 +173,7 @@ io.on('connection', (socket) => {
         const chatId = arg.chatId;
         const senderId = arg.senderId;
         const otherUserId = arg.otherUserId;
-        Message.create({ text: message, sender: senderId }, (err, message) => {
+        Message.create({ text: message, sender: senderId, chatId: chatId }, (err, message) => {
             if (err) {
                 console.log(err);
             } else {
@@ -801,7 +802,7 @@ app.route('/api/messages/:id')
                     } else if (!messages) {
                         console.log("There were no messages found");
                     } else {
-                        console.log(messages);
+                        console.log(`these are the messages in a particular chat with the id given ${messages}`);
                         res.send({ messages: messages });
                     }
                 });

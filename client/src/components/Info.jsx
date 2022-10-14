@@ -116,7 +116,7 @@ export default function Info(props){
             await axios.post(`${endpoint}api/request/${user.user._id}`, {id: id})
             .then( response => {
                 //console.log(response);
-                props.changeUser({...user.user, user: response.data.user});
+                // props.changeUser({...user.user, user: response.data.user});
                 setReqDisabled(true);
             })
             .catch(err => console.log(err));

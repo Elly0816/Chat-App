@@ -13,7 +13,7 @@ export default function Messages(props){
             msgs.scrollTop = msgs.scrollHeight;
         }
         
-    }, [props.messages]);
+    }, [props.messages, props.otherUserId]);
 
    
     // console.log(props);

@@ -12,6 +12,8 @@ export default function Chats(props){
   
   const [filter, setFilter] = useState();
 
+  const [unread, setUnread] = useState(0);
+
   
   useEffect(() => {
    setChats(props.items)
@@ -53,8 +55,11 @@ export default function Chats(props){
          <button onClick={
                         () => {props.getMessages(item[1]._id, item[0].fullName);
                                  props.setId(item[1]._id);
-                                 props.setUserId(item[0]._id);
+                                 props.setOtherUserId(item[0]._id);
                                  props.setUserName(item[0].fullName);
+                                 console.log(toShow);
+                                 console.log('\n');
+                                 console.log(item);
                                  }
                               } 
                               className='chat-tile'

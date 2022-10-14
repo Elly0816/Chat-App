@@ -5,7 +5,6 @@ import Messages from './Messages';
 import Chats from './Chats';
 import { appContext } from '../App';
 import { useContext } from 'react';
-import { createContext } from 'react';
 
 
 export default function Home(props){
@@ -32,7 +31,7 @@ export default function Home(props){
             })
             .catch(err => console.log(err));
         }
-        getChats()
+        getChats();
     }, [])
 
 
@@ -45,10 +44,18 @@ export default function Home(props){
     if(socket){
         socket.on('receive', (arg) => {
             let lastMessage = arg[arg.length -1];
-            // console.log(arg[arg.length -1]);
-            if (otherUserId === lastMessage.sender || user.user._id === lastMessage.sender){
+            console.log(`last message sender id: ${lastMessage.sender} with type ${typeof lastMessage.sender}`);
+            console.log(`I'm chatting with user id: ${otherUserId} with type ${typeof otherUserId}`);
+            console.log(`my id ${user.user._id} with type ${typeof user.user._id}`);
+            //if the last message sender is the same other user id
+            //or the last message sender is the same as the current user id 
+            //show the messages
+            if ((currentChatId === lastMessage.chatId) || (user.user._id === lastMessage.sender)){
                 setMessages(arg);
+                console.log('the other user is in view');
                 // setMessages([...messages, arg])
+            } else {
+                console.log('the other user is not in view and you are not the one that sent the message');
             };
 
 
@@ -79,6 +86,7 @@ export default function Home(props){
                 setMessages([{text: `Start a chat with ${otherUserName}`}]);
             } else {
                 //console.log(response.data.messages)
+                console.log('This is in the get messages function');
                 setMessages(response.data.messages);
             }
         })
@@ -92,7 +100,7 @@ export default function Home(props){
 
     return <div className='home not-header'>
                 <Chats setUserName={setOtherUserName}
-                        setUserId={setUserId}
+                        setOtherUserId={setUserId}
                         setId={setId}
                         getMessages={getMessages}
                         items={items}/>
@@ -101,7 +109,7 @@ export default function Home(props){
                     <div className='message-name'><h6 style={{width: 'fit-content'}}><a href={`#/profile/${otherUserId}`} style={{
                     textDecoration: 'None',
                     color: '#984e3'}}>{otherUserName}</a></h6></div>
-                    <Messages deleteMessage={deleteMessage} userId={user.user._id} messages={messages}/>
+                    <Messages otherUserId={otherUserId} deleteMessage={deleteMessage} userId={user.user._id} messages={messages}/>
                     <Entry otherUserId={otherUserId} chatId={currentChatId} sendMessage={ props.sendMessage } userId={user.user._id}/>
                 </div>}            
     </div>
