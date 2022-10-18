@@ -15,6 +15,7 @@ export default function Home(props){
     const [ currentChatId, setCurrentChatId ] = useState();
     const [ otherUserName, setOtherUserName ] = useState();    
     const [ otherUserId, setOtherUserId ] = useState();
+    const [receivedMessages, setReceivedMessages] = useState();
 
     const {socket, user, endpoint } = useContext(appContext);
 
@@ -32,39 +33,46 @@ export default function Home(props){
             .catch(err => console.log(err));
         }
         getChats();
-    }, [])
+    }, []);
 
 
     //Function to set the other user's id for socket identification
-    function setUserId(id){
-        setOtherUserId(id);
-    }
+    // function setUserId(id){
+    //     setOtherUserId(id);
+    // }
 
     //Socket passed down from app
     if(socket){
         socket.on('receive', (arg) => {
-            let lastMessage = arg[arg.length -1];
-            console.log(`last message sender id: ${lastMessage.sender} with type ${typeof lastMessage.sender}`);
-            console.log(`I'm chatting with user id: ${otherUserId} with type ${typeof otherUserId}`);
-            console.log(`my id ${user.user._id} with type ${typeof user.user._id}`);
-            //if the last message sender is the same other user id
-            //or the last message sender is the same as the current user id 
-            //show the messages
-            if ((currentChatId === lastMessage.chatId) || (user.user._id === lastMessage.sender)){
-                setMessages(arg);
-                console.log('the other user is in view');
-                // setMessages([...messages, arg])
-            } else {
-                console.log('the other user is not in view and you are not the one that sent the message');
-            };
-
-
+            setReceivedMessages(arg)
+        })
         socket.on('deleted', (arg) => {
             //console.log(arg);
             setMessages(arg);
-        })
-          })
-    }
+        });
+    };
+
+    useEffect(()=>{
+                //if the chat id of the last message is the same as the current chat in view, 
+                //Show the messages
+                if(receivedMessages){
+                    let lastMessage = receivedMessages[receivedMessages.length -1];
+                    console.log(lastMessage);
+                    if (lastMessage.chatId === currentChatId){
+                        console.log(`currentChatId: ${currentChatId}`);
+                        console.log(`last message chat Id: ${lastMessage.chatId}`);
+                        setMessages(receivedMessages);
+                        console.log(`The chat is in view`);
+                    } else {
+                        console.log(`The current chat is not in view`);
+                    }
+                }
+               
+    },[receivedMessages]);
+    
+
+
+    
 
 
     //Delete message
@@ -94,14 +102,14 @@ export default function Home(props){
     }
 
     //This sets the id of the chat to load messages from in the Entry component
-    function setId(id){
-        setCurrentChatId(id);
-    }
+    // function setChatId(id){
+    //     setCurrentChatId(id);
+    // }
 
     return <div className='home not-header'>
                 <Chats setUserName={setOtherUserName}
-                        setOtherUserId={setUserId}
-                        setId={setId}
+                        setOtherUserId={setOtherUserId}
+                        setChatId={setCurrentChatId}
                         getMessages={getMessages}
                         items={items}/>
                 {!messages ? <h5>Your chats are on the left. Click on one to view the messages.</h5> 
@@ -109,7 +117,7 @@ export default function Home(props){
                     <div className='message-name'><h6 style={{width: 'fit-content'}}><a href={`#/profile/${otherUserId}`} style={{
                     textDecoration: 'None',
                     color: '#984e3'}}>{otherUserName}</a></h6></div>
-                    <Messages otherUserId={otherUserId} deleteMessage={deleteMessage} userId={user.user._id} messages={messages}/>
+                    <Messages chatId={currentChatId} deleteMessage={deleteMessage} userId={user.user._id} messages={messages}/>
                     <Entry otherUserId={otherUserId} chatId={currentChatId} sendMessage={ props.sendMessage } userId={user.user._id}/>
                 </div>}            
     </div>

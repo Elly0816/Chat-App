@@ -54,12 +54,10 @@ export default function Chats(props){
          <hr/>
          <button onClick={
                         () => {props.getMessages(item[1]._id, item[0].fullName);
-                                 props.setId(item[1]._id);
+                                 props.setChatId(item[1]._id);
                                  props.setOtherUserId(item[0]._id);
                                  props.setUserName(item[0].fullName);
-                                 console.log(toShow);
-                                 console.log('\n');
-                                 console.log(item);
+                                 console.log(`The chatid of the current chat clicked: ${item[1]._id}`);
                                  }
                               } 
                               className='chat-tile'
