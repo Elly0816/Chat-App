@@ -56,6 +56,7 @@ const messageSchema = new mongoose.Schema({
     sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     time: { type: Date, default: Date.now },
     chatId: { type: mongoose.Schema.Types.ObjectId, ref: 'Chat' },
+    seen: false
 });
 
 /*Schema for chats*/
@@ -114,8 +115,8 @@ io.on('connection', (socket) => {
                 } else if (!user) {
                     console.log("There was no user found");
                 } else {
-                    console.log("The socket id was added to the user");
-                    console.log(user);
+                    // console.log("The socket id was added to the user");
+                    // console.log(user);
                 }
             });
     });
@@ -660,7 +661,9 @@ app.route('/api/chats/:user')
                             if (err) {
                                 console.log(err);
                             } else {
-                                res.send({ chats: chats, otherUsers: users });
+                                const chatIds = chats.map(chat => chat._id);
+                                //map the unread function to an array of chat ids 
+                                send(res, chats, users, chatIds, userId);
                             }
                         });
 
@@ -813,3 +816,59 @@ app.route('/api/messages/:id')
 server.listen(port, () => {
     console.log(`Server up and running at ${port}`);
 });
+
+//This handles the sending of the unreads to the client
+async function send(res, chats, users, chatIds, userId) {
+    await forIds(chatIds, userId)
+        .then(unreads => {
+            res.send({ chats: chats, otherUsers: users, unreads: unreads });
+        })
+        .catch(err => console.log(err));
+};
+
+
+//This function does the mapping 
+
+async function forIds(chatIds, userId) {
+    // let msgArray = [];
+    let msgArray = await Promise.all(chatIds.map(async chatId => {
+        try {
+            return await showUnread(chatId, userId);
+        } catch (err) {
+            console.log(err);
+        }
+    }));
+    return msgArray;
+};
+
+
+//Function that returns the number of unread messages in certain chat
+//This takes a chatId and UserId
+async function showUnread(chatId, userId) {
+    const chatIdString = chatId.toString();
+    try {
+        const chatMessages = await Chat.findById(chatIdString, 'messages');
+        // console.log("Chat messages");
+        // console.log(chatMessages);
+        const messages = await findMessages(chatMessages.messages, userId);
+        console.log(messages);
+        return messages;
+    } catch (err) {
+        console.log(err);
+    };
+};
+
+
+//This is to find the messages from the chat Ids
+async function findMessages(messageIds, userId) {
+    // console.log("These are the messages ids");
+    // console.log(messageIds);
+    try {
+        const messages = await Message.find({ _id: { $in: messageIds } });
+        const count = messages.filter(msg => msg.sender.toString() !== userId).length;
+        console.log(count);
+        return count;
+    } catch (err) {
+        console.log(err);
+    };
+};

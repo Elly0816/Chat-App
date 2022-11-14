@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import Footer from './Footer';
 import { useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
 import { appContext } from '../App';
 
 export default function Login(props){

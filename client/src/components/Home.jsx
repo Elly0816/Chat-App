@@ -24,7 +24,7 @@ export default function Home(props){
             //console.log(`${endpoint}chats/${user.user._id}`);
             await axios.get(`${endpoint}api/chats/${user.user._id}`)
             .then(response => {
-                //console.log(response.data);
+                console.log(response.data);
                 const chats = response.data.chats;
                 const people = response.data.otherUsers;
                 const peopleAndChats = people.map((person, index) => [person, chats[index]]);
@@ -45,7 +45,8 @@ export default function Home(props){
     if(socket){
         socket.on('receive', (arg) => {
             setReceivedMessages(arg)
-        })
+        });
+        
         socket.on('deleted', (arg) => {
             //console.log(arg);
             setMessages(arg);
