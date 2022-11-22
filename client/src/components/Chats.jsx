@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
+import Unread from './Unread';
 
 
 
@@ -12,7 +13,7 @@ export default function Chats(props){
   
   const [filter, setFilter] = useState();
 
-  const [unread, setUnread] = useState(0);
+//   const [unread, setUnread] = useState();
 
   
   useEffect(() => {
@@ -22,6 +23,7 @@ export default function Chats(props){
   useEffect(() => {
    setToShow(chats);
   }, [chats])
+
   
   
   function handleChange(e){
@@ -64,7 +66,11 @@ export default function Chats(props){
 
                            type='submit'>
             {/* <a href={`#/profile/${item[0]._id}`}></a> */}
+            {/* <span className='insideButton'>
+              
+            </span> */}
             <h6>{item[0].fullName}</h6>
+            { item[2] > 0 && <Unread unread={item[2]}/>}
          </button>
       </div>
       )}

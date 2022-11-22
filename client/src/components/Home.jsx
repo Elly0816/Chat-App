@@ -27,7 +27,8 @@ export default function Home(props){
                 console.log(response.data);
                 const chats = response.data.chats;
                 const people = response.data.otherUsers;
-                const peopleAndChats = people.map((person, index) => [person, chats[index]]);
+                const unread = response.data.unreads;
+                const peopleAndChats = people.map((person, index) => [person, chats[index], unread[index]]);
                 setItems(peopleAndChats);
             })
             .catch(err => console.log(err));
@@ -95,8 +96,10 @@ export default function Home(props){
                 setMessages([{text: `Start a chat with ${otherUserName}`}]);
             } else {
                 //console.log(response.data.messages)
-                console.log('This is in the get messages function');
+                // console.log('This is in the get messages function');
+                console.log(response.data.messages);
                 setMessages(response.data.messages);
+                socket.emit('seen', {chatId: id, userId: user.user._id});
             }
         })
         .catch(err => console.log(err));

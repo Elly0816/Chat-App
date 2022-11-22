@@ -226,6 +226,34 @@ io.on('connection', (socket) => {
             }
         });
     });
+
+
+    //This handles the marking of viewed messages as seen
+    socket.on('seen', (arg) => {
+
+        const userId = arg.userId;
+        const chatId = arg.chatId;
+        console.log(`The messages in ${chatId} have been seen by the user with id: ${userId}`);
+        console.log(userId, chatId);
+        /*Write a function that turns the seen property
+         of all the messages belonging to the other user
+          in the chat to true?
+        */
+
+        /*
+          emit an object of {chats, otherUsers, unreads} from the socket 
+         */
+        Chat.findById(chatId, (err, chat) => {
+            if (err) {
+                console.log(err);
+            } else if (!chat) {
+                console.log("There was no chat found");
+            } else {
+                const messages = chat.messages;
+                console.log(messages);
+            }
+        });
+    });
 });
 
 
@@ -805,7 +833,7 @@ app.route('/api/messages/:id')
                     } else if (!messages) {
                         console.log("There were no messages found");
                     } else {
-                        console.log(`these are the messages in a particular chat with the id given ${messages}`);
+                        // console.log(`these are the messages in a particular chat with the id given ${messages}`);
                         res.send({ messages: messages });
                     }
                 });

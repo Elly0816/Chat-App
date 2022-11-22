@@ -193,15 +193,30 @@ h6 {
     background-color: white;
     padding: 5px;
     position: absolute;
-    height: fit-content;
+    height: min-content;
     border-radius: 5em;
     color: #0984e3;
+}
+
+.chat-tile>h6 {
+    display: inline;
+    margin-right: 0.2em;
+    ;
+}
+
+.unread {
+    padding: 0.2em;
+    color: white;
+    background-color: green;
+    border-radius: 45%;
+    display: inline;
 }
 
 .buttons {
     overflow-y: auto;
     height: 81%;
     max-height: 81%;
+    padding-top: 0.5em;
 }
 
 a {
@@ -210,7 +225,8 @@ a {
 }
 
 .buttonContainer {
-    margin: 1em 0 1em;
+    /* margin: 1em 0 1em; */
+    margin: 0 auto 1em;
     position: relative;
     border-radius: 5em;
     display: flex;
@@ -286,6 +302,7 @@ a {
 .chat-tile {
     border-width: 2px;
     color: black;
+    display: inline;
 }
 
 .people {
