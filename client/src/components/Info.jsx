@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 import { appContext } from '../App';
-import { useContext } from 'react';
 
 
 
@@ -42,19 +41,19 @@ export default function Info(props){
                 console.log(`The id is: ${id}`);
                 if (id === user.user._id){
                     setIsUser(true);
-                    props.changeUser({...user.user, auth: user.auth, user: response.data.response});
+                    // props.changeUser({...user.user, auth: user.auth, user: response.data.response});
                 } else {
                     setIsUser(false);
                 }
                 
                 })
             .catch(err => {
-                //console.log(err);
+                console.log(err);
             });
         }
         getDetails();
         
-    }, [id, profile._id]);
+    }, [id, profile._id, user.user.firstName, user.user.lastName, user.user.email]);
 
 
     //useEffect to change buttons that show on the page
@@ -93,15 +92,15 @@ export default function Info(props){
                 email: profile.email
             })
             .then( response => {
-                //console.log(response.data.response);
-                props.changeUser({...user.user, user: response.data.response});
+                console.log(response.data.response);
+                props.changeUser({...user, user: response.data.response});
             })
             .catch(err => {
                 console.log(err);
             })
         }
         changeDetails();
-        navigate(`/profile/${id}`);
+        
 
     }
 
@@ -132,7 +131,7 @@ export default function Info(props){
         async function accept(){
             axios.post(`${endpoint}api/connection/${user.user._id}`, {id: id})
                 .then(response => {
-                props.changeUser({...user.user, user: response.data.user})
+                props.changeUser({...user, user: response.data.user})
                 setConnected(true);
                 })
                 .catch(err => console.log(err));
@@ -144,7 +143,7 @@ export default function Info(props){
         async function remove(){
             axios.patch(`${endpoint}api/connection/${user.user._id}`, {id: id})
                 .then(response => {
-                    props.changeUser({...user.user, user: response.data.user})
+                    props.changeUser({...user, user: response.data.user})
                     setConnected(false);
                     profile.connections.filter(connection => connection !== user.user._id);
                 })
@@ -193,7 +192,7 @@ export default function Info(props){
 
                             { isUser && <div onClick={ () => getRequests('pendingRequests') }>
                                 <span>Pending Requests:</span>
-                                <h6>{ user.user.pendingRequests.length }</h6>
+                                <h6>{ profile.pendingRequests.length }</h6>
                             </div> }
                             
                             {!requestSent && !connected && user.auth &&  !isUser && <Button type="button" onClick={sendRequest} disabled={reqDisabled} variant='primary'>{reqDisabled ? 'Request Sent' : 'Send Request'}</Button>}

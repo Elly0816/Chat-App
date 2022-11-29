@@ -52,6 +52,17 @@ export default function Home(props){
             //console.log(arg);
             setMessages(arg);
         });
+
+        socket.on('read', (arg) => {
+            console.log('read event was emitted');
+            console.log(arg);
+            const chats = arg.chats;
+            const people = arg.otherUsers;
+            const unreads = arg.unreads;
+            // const peopleAndChats = people.map((person, index) => [person, chats[index], unreads[index]]);
+            const peopleAndChats = people.map((person, index) => [person, chats[index], chats[index]._id === currentChatId? 0 : unreads[index]]);
+            setItems(peopleAndChats);
+        });
     };
 
     useEffect(()=>{
@@ -73,9 +84,13 @@ export default function Home(props){
     },[receivedMessages]);
     
 
-
+    // //Mark messages as read
+    // function markMessagesRead(chatId, userId=user.user._id){
+    //     if (socket){
+    //         socket.emit('read', {chatId, userId});
+    //     }
+    // };
     
-
 
     //Delete message
     function deleteMessage(id){
@@ -88,7 +103,7 @@ export default function Home(props){
     
 
     //This initally loads up the messages chat from the database
-    function getMessages(id, otherUserName) {
+    function getMessages(id, otherUserName, otherUserId) {
         axios.get(`${endpoint}api/messages/${id}`)
         .then(response => {
             if (!response.data.messages){
@@ -99,7 +114,7 @@ export default function Home(props){
                 // console.log('This is in the get messages function');
                 console.log(response.data.messages);
                 setMessages(response.data.messages);
-                socket.emit('seen', {chatId: id, userId: user.user._id});
+                socket.emit('seen', {chatId: id, userId: user.user._id, otherUserId: otherUserId});
             }
         })
         .catch(err => console.log(err));
@@ -115,7 +130,8 @@ export default function Home(props){
                         setOtherUserId={setOtherUserId}
                         setChatId={setCurrentChatId}
                         getMessages={getMessages}
-                        items={items}/>
+                        items={items}
+                        />
                 {!messages ? <h5>Your chats are on the left. Click on one to view the messages.</h5> 
                 : <div className='message-container-container'>
                     <div className='message-name'><h6 style={{width: 'fit-content'}}><a href={`#/profile/${otherUserId}`} style={{

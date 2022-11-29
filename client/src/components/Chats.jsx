@@ -18,7 +18,7 @@ export default function Chats(props){
   
   useEffect(() => {
    setChats(props.items)
-  });
+  }, [props.items]);
 
   useEffect(() => {
    setToShow(chats);
@@ -55,7 +55,7 @@ export default function Chats(props){
       <div key={item[0]._id} className='buttonContainer'>
          <hr/>
          <button onClick={
-                        () => {props.getMessages(item[1]._id, item[0].fullName);
+                        () => {props.getMessages(item[1]._id, item[0].fullName, item[0]._id);
                                  props.setChatId(item[1]._id);
                                  props.setOtherUserId(item[0]._id);
                                  props.setUserName(item[0].fullName);

@@ -56,7 +56,7 @@ const messageSchema = new mongoose.Schema({
     sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     time: { type: Date, default: Date.now },
     chatId: { type: mongoose.Schema.Types.ObjectId, ref: 'Chat' },
-    seen: false
+    seen: { type: String, default: 'false' }
 });
 
 /*Schema for chats*/
@@ -198,6 +198,7 @@ io.on('connection', (socket) => {
                                         io.to(socketId).emit('receive', msgs);
                                         socket.emit('receive', msgs);
                                         io.to(socketId).emit('play');
+                                        otherSocketSend(user._id.toString());
                                     }
                                 })
                             }
@@ -233,8 +234,10 @@ io.on('connection', (socket) => {
 
         const userId = arg.userId;
         const chatId = arg.chatId;
-        console.log(`The messages in ${chatId} have been seen by the user with id: ${userId}`);
-        console.log(userId, chatId);
+        const otherUserId = arg.otherUserId;
+        // console.log(`The messages in ${chatId} have been seen by the user with id: ${userId}`);
+        // console.log(userId, chatId);
+        console.log(`This should be seen by ${otherUserId}`);
         /*Write a function that turns the seen property
          of all the messages belonging to the other user
           in the chat to true?
@@ -250,9 +253,43 @@ io.on('connection', (socket) => {
                 console.log("There was no chat found");
             } else {
                 const messages = chat.messages;
-                console.log(messages);
+                // console.log(messages);
+                messagesHaveBeenRead(messages).then(messageItems => {
+                    User.findById(userId, 'chats', (err, user) => {
+                        if (err) {
+                            console.log(err);
+                        } else if (!user) {
+                            console.log("The user does not exist");
+                        } else {
+                            const chats = user.chats.map(chat => chat.toString());
+                            Chat.find({ '_id': { $in: chats } }, (err, chats) => {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    const otherUsers = chats.map(chat => chat.between.filter(id => id.toString() !== userId)).map(id => id.toString());
+                                    // console.log(otherUsers);
+                                    User.find({ '_id': { $in: otherUsers } }, (err, users) => {
+                                        if (err) {
+                                            console.log(err);
+                                        } else {
+                                            const chatIds = chats.map(chat => chat._id);
+                                            //map the unread function to an array of chat ids 
+                                            // socketSend(socket, users.socketId, chats, users.fullName, chatIds, userId, otherUserId);
+                                            socketSend(socket, chats, users, chatIds, userId);
+                                            // otherSocketSend(otherUserId);
+                                        }
+                                    });
+
+                                }
+                            })
+                        }
+                    });
+                    // socketSend(socket, chats, users, chatIds, userId);
+                })
+
             }
         });
+
     });
 });
 
@@ -858,7 +895,10 @@ async function send(res, chats, users, chatIds, userId) {
 //This function does the mapping 
 
 async function forIds(chatIds, userId) {
-    // let msgArray = [];
+    // let chatIds = chatIds;
+    if (typeof chatIds == 'string') {
+        chatIds = [chatIds];
+    };
     let msgArray = await Promise.all(chatIds.map(async chatId => {
         try {
             return await showUnread(chatId, userId);
@@ -873,13 +913,14 @@ async function forIds(chatIds, userId) {
 //Function that returns the number of unread messages in certain chat
 //This takes a chatId and UserId
 async function showUnread(chatId, userId) {
+    // console.log(chatId);
     const chatIdString = chatId.toString();
     try {
         const chatMessages = await Chat.findById(chatIdString, 'messages');
         // console.log("Chat messages");
         // console.log(chatMessages);
         const messages = await findMessages(chatMessages.messages, userId);
-        console.log(messages);
+        // console.log(messages);
         return messages;
     } catch (err) {
         console.log(err);
@@ -893,10 +934,56 @@ async function findMessages(messageIds, userId) {
     // console.log(messageIds);
     try {
         const messages = await Message.find({ _id: { $in: messageIds } });
-        const count = messages.filter(msg => msg.sender.toString() !== userId).length;
-        console.log(count);
+        const count = messages.filter(msg => msg.sender.toString() !== userId).filter(msg => msg.seen === 'false').length;
+        // console.log(count);
         return count;
     } catch (err) {
         console.log(err);
     };
+};
+
+async function messagesHaveBeenRead(messages) {
+    let messagesMarkedRead = await messages.map(message => read(message));
+    return messagesMarkedRead;
+}
+
+//This function handles the changing of all
+async function read(message) {
+    let messageDoc = await Message.findOneAndUpdate({ _id: message._id }, { seen: true }, { returnOriginal: false });
+    return messageDoc;
+};
+
+//This emits the read to the user socket
+async function socketSend(socket, chats, users, chatIds, userId, ) {
+    await forIds(chatIds, userId)
+        .then(unreads => {
+            // res.send({ chats: chats, otherUsers: users, unreads: unreads });
+            socket.emit('read', { chats: chats, otherUsers: users, unreads: unreads });
+            // io.to(otherUserSocket).emit('new message', chatIds);
+            // console.log(unreads);
+        })
+        .catch(err => console.log(err));
+
+
+};
+
+//This emits the read to the other user socket
+async function otherSocketSend(otherUserId) {
+    const user = await User.findById(otherUserId);
+    const chatIds = user.chats;
+    const socket = user.socketId;
+    // console.log(`The socket id for the ${user.fullName} is ${socket}`);
+    // console.log(`The above user is the other user.`);\
+    const chats = await Chat.find({ _id: { $in: chatIds } });
+    const otherUsersIds = chats.map(chat => chat.between.filter(id => id.toString() !== otherUserId)).map(id => id.toString());
+    const otherUsers = await User.find({ _id: { $in: otherUsersIds } });
+    // console.log('other socket send');
+    await forIds(chatIds, user._id)
+        .then(unreads => {
+            // res.send({ chats: chats, otherUsers: users, unreads: unreads });
+            io.to(socket).emit('read', { chats: chats, otherUsers: otherUsers, unreads: unreads });
+            // io.to(otherUserSocket).emit('new message', chatIds);
+            // console.log(unreads);
+        })
+        .catch(err => console.log(err));
 };

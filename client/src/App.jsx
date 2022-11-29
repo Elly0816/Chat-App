@@ -102,7 +102,7 @@ function App() {
             <Route path="/profile/:id" element={<Info changeUser={ authenticate } /> } />
             <Route path="/login" element={ 
               !user.auth ? <Login authenticate={ authenticate }/> : <Navigate to="/" /> } />
-            {user.auth !== null && <Route path="/" element={ user.auth ? <Home
+            {user.auth && <Route path="/" element={ user.auth ? <Home
                                                             sendMessage={ sendMessage } /> : <Navigate to="/login" /> }/>}
             {user.auth && <Route path="/:request/:id" element={ <People setUser={ setUser } user={ user } endpoint={ endpoint }/> } />}
           </Routes>
