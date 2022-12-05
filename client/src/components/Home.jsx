@@ -132,7 +132,9 @@ export default function Home(props){
                         getMessages={getMessages}
                         items={items}
                         />
-                {!messages ? <h5>Your chats are on the left. Click on one to view the messages.</h5> 
+                {!messages ? <div className='message-container-container'>
+                    <h5>Your chats are on the left. Click on one to view the messages.</h5>
+                </div> 
                 : <div className='message-container-container'>
                     <div className='message-name'><h6 style={{width: 'fit-content'}}><a href={`#/profile/${otherUserId}`} style={{
                     textDecoration: 'None',
