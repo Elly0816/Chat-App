@@ -2,14 +2,14 @@
     "name": "chat-app",
     "version": "1.0.0",
     "description": "",
-    "main": "app.js",
+    "main": "server/app.js",
     "engines": {
         "node": "16.15.0",
         "npm": "8.5.5"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node app.js",
+        "start": "node server/app.js",
         "heroku-postbuild": "cd ./client && npm install && npm run build"
     },
     "keywords": [],
