@@ -1,297 +1,50 @@
-const express = require('express');
-const app = express();
-const cors = require('cors');
-const mongoose = require('mongoose');
-const http = require('http');
-const passportLocalMongoose = require('passport-local-mongoose');
-const { Server } = require('socket.io');
-const passport = require('passport');
-const session = require('express-session');
+// const express = require('express');
+// const app = express();
+// const cors = require('cors');
+// const session = require('express-session');
+// const path = require('path');
+const { app, server } = require('./socket');
+const { User, Message, Chat } = require('./database.js');
+const { send } = require('./functions.js');
 const jwt = require('jsonwebtoken');
+// const http = require('http');
+// const { Server } = require('socket.io');
 require('dotenv').config();
-const path = require('path');
 
-
-
-app.use(cors());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.set('trust proxy', 1)
-app.use(session({
-    secret: process.env.SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: true }
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-
-const url = process.env.NODE_ENV === 'production' ? process.env.MONGO : "mongodb://localhost:27017/chatDB";
-
-
-
-const server = http.createServer(app);
-
-/*Creates the websocket */
-const io = new Server(server, {
-    cors: {
-        origin: process.env.CLIENT,
-        methods: ["GET", "POST"]
-    }
-});
-
-
-mongoose.connect(url);
-// mongoose.connect('mongodb://localhost:27017/chatDB');
+// const { server } = require('./socket');
 
 const port = process.env.PORT || 5000;
 
 
-app.use(express.static(path.join(__dirname, 'client/build')));
 
-/*Message Schema*/
-
-const messageSchema = new mongoose.Schema({
-    text: String,
-    sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    time: { type: Date, default: Date.now },
-    chatId: { type: mongoose.Schema.Types.ObjectId, ref: 'Chat' },
-    seen: { type: String, default: 'false' }
-});
-
-/*Schema for chats*/
-const chatSchema = new mongoose.Schema({
-    between: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }]
-});
-
-/*User Schema */
-const userSchema = new mongoose.Schema({
-    userName: String,
-    firstName: String,
-    lastName: String,
-    fullName: String,
-    email: String,
-    password: String,
-    connections: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    chats: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chat' }],
-    pendingRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    requests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    socketId: String
-});
-
-/*Add passport local mongoose to the user schema */
-userSchema.plugin(passportLocalMongoose);
-
-/*Create the models*/
-const User = mongoose.model('User', userSchema);
-const Message = mongoose.model('Message', messageSchema);
-const Chat = mongoose.model('Chat', chatSchema);
-
-/*Authenticate with local strategy */
-passport.use(User.createStrategy());
-
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+// app.use(cors());
+// app.use(express.urlencoded({ extended: true }));
+// app.use(express.json());
+// app.set('trust proxy', 1)
+// app.use(session({
+//     secret: process.env.SECRET,
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: { secure: true }
+// }));
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 
-/*
+// app.use(express.static(path.join(__dirname, 'client/build')));
 
-            WEB SOCKET
+// const port = process.env.PORT || 5000;
 
+// const server = http.createServer(app);
 
-*/
+// /*Creates the websocket */
+// const io = new Server(server, {
+//     cors: {
+//         origin: process.env.CLIENT,
+//         methods: ["GET", "POST"]
+//     }
+// });
 
-io.on('connection', (socket) => {
-    console.log(`user ${socket.id} connected to the server`);
-
-    //Listen to when the event to add the socket id to the user's socket field is fired
-    socket.on('add', (arg) => {
-        const currentUser = arg.userId;
-        User.findByIdAndUpdate(currentUser, { $set: { socketId: socket.id } }, { new: true },
-            (err, user) => {
-                if (err) {
-                    console.log(err);
-                } else if (!user) {
-                    console.log("There was no user found");
-                } else {
-                    // console.log("The socket id was added to the user");
-                    // console.log(user);
-                }
-            });
-    });
-
-    socket.on("disconnect", () => {
-        console.log(`user ${socket.id} disconnected from the server`);
-
-    });
-
-    //Socket on delete
-    socket.on('delete', (arg) => {
-        const otherUser = arg.otherUser;
-        const messageId = arg.id;
-        const chatId = arg.chatId;
-        Message.findByIdAndUpdate(messageId, { $set: { text: '***This message was deleted***' } }, { new: true }, (err, message) => {
-            if (err) {
-                console.log(err);
-            } else if (!message) {
-                console.log("The message to delete was not found");
-            } else {
-                Chat.findById(chatId, (err, chat) => {
-                    if (err) {
-                        console.log(err);
-                    } else if (!chat) {
-                        console.log("The chat that the message was deleted from was not found");
-                    } else {
-                        User.findById(otherUser, (err, user) => {
-                            if (err) {
-                                console.log("There was an error in the database");
-                            } else if (!user) {
-                                console.log("The other user was not found after deleting the message");
-                            } else {
-                                const messages = chat.messages.map(message => message.toString());
-                                Message.find({ '_id': { $in: messages } }, (err, msgs) => {
-                                    if (err) {
-                                        console.log(err);
-                                    } else if (!msgs) {
-                                        console.log("Could not find the messages from the chat after deleting the message");
-                                    } else {
-                                        socket.emit('deleted', msgs);
-                                        io.to(user.socketId).emit('deleted', msgs);
-                                    }
-                                })
-                            }
-                        })
-                    }
-                });
-            }
-        })
-    });
-
-    /*This sends a message to the user currently being chatted with */
-    socket.on('send', (arg) => {
-        const message = arg.message;
-        const chatId = arg.chatId;
-        const senderId = arg.senderId;
-        const otherUserId = arg.otherUserId;
-        Message.create({ text: message, sender: senderId, chatId: chatId }, (err, message) => {
-            if (err) {
-                console.log(err);
-            } else {
-                Chat.findByIdAndUpdate(chatId, { $push: { messages: message._id } }, { new: true }, (err, chat) => {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        const messageIds = chat.messages.map(message => message.toString());
-                        Message.find({ '_id': { $in: messageIds } }, (err, msgs) => {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                //Find the current user and set the socket id to the current on if it is not already that
-                                User.findById(otherUserId, (err, user) => {
-                                    if (err) {
-                                        console.log(err);
-                                    } else if (!user) {
-                                        console.log("The other user could not be found while retreiving the socket id");
-                                    } else {
-                                        const socketId = user.socketId;
-                                        io.to(socketId).emit('receive', msgs);
-                                        socket.emit('receive', msgs);
-                                        io.to(socketId).emit('play');
-                                        otherSocketSend(user._id.toString());
-                                    }
-                                })
-                            }
-                        })
-                    }
-                })
-            }
-        });
-    });
-
-
-    /*This searches the database for a matching username */
-    socket.on('search', (arg) => {
-        console.log(arg, 'is what is in the search box');
-        const regex = new RegExp(arg, 'i');
-        User.find({ fullName: { $regex: regex } }, (err, users) => {
-            if (err) {
-                console.log(err);
-            } else {
-                if (!users) {
-                    socket.emit('search', 'No users found');
-                } else {
-                    socket.emit('search', users);
-                    console.log(users);
-                }
-            }
-        });
-    });
-
-
-    //This handles the marking of viewed messages as seen
-    socket.on('seen', (arg) => {
-
-        const userId = arg.userId;
-        const chatId = arg.chatId;
-        const otherUserId = arg.otherUserId;
-        // console.log(`The messages in ${chatId} have been seen by the user with id: ${userId}`);
-        // console.log(userId, chatId);
-        console.log(`This should be seen by ${otherUserId}`);
-        /*Write a function that turns the seen property
-         of all the messages belonging to the other user
-          in the chat to true?
-        */
-
-        /*
-          emit an object of {chats, otherUsers, unreads} from the socket 
-         */
-        Chat.findById(chatId, (err, chat) => {
-            if (err) {
-                console.log(err);
-            } else if (!chat) {
-                console.log("There was no chat found");
-            } else {
-                const messages = chat.messages;
-                // console.log(messages);
-                messagesHaveBeenRead(messages).then(messageItems => {
-                    User.findById(userId, 'chats', (err, user) => {
-                        if (err) {
-                            console.log(err);
-                        } else if (!user) {
-                            console.log("The user does not exist");
-                        } else {
-                            const chats = user.chats.map(chat => chat.toString());
-                            Chat.find({ '_id': { $in: chats } }, (err, chats) => {
-                                if (err) {
-                                    console.log(err);
-                                } else {
-                                    const otherUsers = chats.map(chat => chat.between.filter(id => id.toString() !== userId)).map(id => id.toString());
-                                    // console.log(otherUsers);
-                                    User.find({ '_id': { $in: otherUsers } }, (err, users) => {
-                                        if (err) {
-                                            console.log(err);
-                                        } else {
-                                            const chatIds = chats.map(chat => chat._id);
-                                            //map the unread function to an array of chat ids 
-                                            // socketSend(socket, users.socketId, chats, users.fullName, chatIds, userId, otherUserId);
-                                            socketSend(socket, chats, users, chatIds, userId);
-                                            // otherSocketSend(otherUserId);
-                                        }
-                                    });
-
-                                }
-                            })
-                        }
-                    });
-                    // socketSend(socket, chats, users, chatIds, userId);
-                })
-
-            }
-        });
-
-    });
-});
 
 
 /*
@@ -878,112 +631,7 @@ app.route('/api/messages/:id')
         });
     });
 
+
 server.listen(port, () => {
     console.log(`Server up and running at ${port}`);
 });
-
-//This handles the sending of the unreads to the client
-async function send(res, chats, users, chatIds, userId) {
-    await forIds(chatIds, userId)
-        .then(unreads => {
-            res.send({ chats: chats, otherUsers: users, unreads: unreads });
-        })
-        .catch(err => console.log(err));
-};
-
-
-//This function does the mapping 
-
-async function forIds(chatIds, userId) {
-    // let chatIds = chatIds;
-    if (typeof chatIds == 'string') {
-        chatIds = [chatIds];
-    };
-    let msgArray = await Promise.all(chatIds.map(async chatId => {
-        try {
-            return await showUnread(chatId, userId);
-        } catch (err) {
-            console.log(err);
-        }
-    }));
-    return msgArray;
-};
-
-
-//Function that returns the number of unread messages in certain chat
-//This takes a chatId and UserId
-async function showUnread(chatId, userId) {
-    // console.log(chatId);
-    const chatIdString = chatId.toString();
-    try {
-        const chatMessages = await Chat.findById(chatIdString, 'messages');
-        // console.log("Chat messages");
-        // console.log(chatMessages);
-        const messages = await findMessages(chatMessages.messages, userId);
-        // console.log(messages);
-        return messages;
-    } catch (err) {
-        console.log(err);
-    };
-};
-
-
-//This is to find the messages from the chat Ids
-async function findMessages(messageIds, userId) {
-    // console.log("These are the messages ids");
-    // console.log(messageIds);
-    try {
-        const messages = await Message.find({ _id: { $in: messageIds } });
-        const count = messages.filter(msg => msg.sender.toString() !== userId).filter(msg => msg.seen === 'false').length;
-        // console.log(count);
-        return count;
-    } catch (err) {
-        console.log(err);
-    };
-};
-
-async function messagesHaveBeenRead(messages) {
-    let messagesMarkedRead = await messages.map(message => read(message));
-    return messagesMarkedRead;
-}
-
-//This function handles the changing of all
-async function read(message) {
-    let messageDoc = await Message.findOneAndUpdate({ _id: message._id }, { seen: true }, { returnOriginal: false });
-    return messageDoc;
-};
-
-//This emits the read to the user socket
-async function socketSend(socket, chats, users, chatIds, userId, ) {
-    await forIds(chatIds, userId)
-        .then(unreads => {
-            // res.send({ chats: chats, otherUsers: users, unreads: unreads });
-            socket.emit('read', { chats: chats, otherUsers: users, unreads: unreads });
-            // io.to(otherUserSocket).emit('new message', chatIds);
-            // console.log(unreads);
-        })
-        .catch(err => console.log(err));
-
-
-};
-
-//This emits the read to the other user socket
-async function otherSocketSend(otherUserId) {
-    const user = await User.findById(otherUserId);
-    const chatIds = user.chats;
-    const socket = user.socketId;
-    // console.log(`The socket id for the ${user.fullName} is ${socket}`);
-    // console.log(`The above user is the other user.`);\
-    const chats = await Chat.find({ _id: { $in: chatIds } });
-    const otherUsersIds = chats.map(chat => chat.between.filter(id => id.toString() !== otherUserId)).map(id => id.toString());
-    const otherUsers = await User.find({ _id: { $in: otherUsersIds } });
-    // console.log('other socket send');
-    await forIds(chatIds, user._id)
-        .then(unreads => {
-            // res.send({ chats: chats, otherUsers: users, unreads: unreads });
-            io.to(socket).emit('read', { chats: chats, otherUsers: otherUsers, unreads: unreads });
-            // io.to(otherUserSocket).emit('new message', chatIds);
-            // console.log(unreads);
-        })
-        .catch(err => console.log(err));
-};
