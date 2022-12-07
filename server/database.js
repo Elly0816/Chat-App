@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const passportLocalMongoose = require('passport-local-mongoose');
 const passport = require('passport');
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 
 
 const url = process.env.NODE_ENV === 'production' ? process.env.MONGO : "mongodb://localhost:27017/chatDB";
@@ -27,6 +27,10 @@ const chatSchema = new mongoose.Schema({
 
 /*User Schema */
 const userSchema = new mongoose.Schema({
+    img: {
+        data: Buffer,
+        contentType: String
+    },
     userName: String,
     firstName: String,
     lastName: String,

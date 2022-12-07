@@ -9,7 +9,7 @@ const { send } = require('./functions.js');
 const jwt = require('jsonwebtoken');
 // const http = require('http');
 // const { Server } = require('socket.io');
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 
 // const { server } = require('./socket');
 

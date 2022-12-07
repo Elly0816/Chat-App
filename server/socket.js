@@ -11,7 +11,7 @@ const { Server } = require('socket.io');
 const { User, Message, Chat, passport } = require('./database');
 const { otherSocketSend, socketSend, messagesHaveBeenRead } = require('./functions');
 // const { Server } = require('socket.io');
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 
 
 app.use(cors());
