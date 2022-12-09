@@ -11,7 +11,7 @@ const { Server } = require('socket.io');
 const { User, Message, Chat, passport } = require('./database');
 const { otherSocketSend, socketSend, messagesHaveBeenRead } = require('./functions');
 // const { Server } = require('socket.io');
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config();
 
 
 app.use(cors());
@@ -27,6 +27,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// console.log(`the secret is ${process.env.SECRET}`);
 
 app.use(express.static(path.join(__dirname, 'client/build')));
 

@@ -23,7 +23,7 @@ export default function Messages(props){
     <h6>{ message.text }</h6>
     <div className='message-bottom'>
         <p className='message-time'>{ new Date(message.time).getHours() }:{new Date(message.time).getMinutes()}</p>
-        { message.text !== '***This message was deleted***' && message.sender.toString() === props.userId && <Button title='delete this message' onClick={() => {props.deleteMessage(message._id)}} variant='outline' style={{fontSize: 'x-small', position: 'absolute', right: '20px'}}>X</Button>}
+        { message.text !== '***This message was deleted***' && message.sender.toString() === props.userId && <Button title='delete this message' onClick={() => {props.deleteMessage(message._id)}} variant='outline' style={{fontSize: 'x-small'}}>X</Button>}
     </div>
     
 </div> )} 

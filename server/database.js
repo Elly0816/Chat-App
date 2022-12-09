@@ -9,6 +9,8 @@ const url = process.env.NODE_ENV === 'production' ? process.env.MONGO : "mongodb
 
 mongoose.connect(url);
 
+// console.log(`the url is ${url}`);
+
 
 /*Message Schema*/
 const messageSchema = new mongoose.Schema({
@@ -19,7 +21,7 @@ const messageSchema = new mongoose.Schema({
     seen: { type: String, default: 'false' }
 });
 
-/*Schema for chats*/
+/*Chat Schema*/
 const chatSchema = new mongoose.Schema({
     between: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }]
