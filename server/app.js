@@ -180,7 +180,7 @@ app.post('/api/logout', (req, res) => {
 app.route('/api/profile/:id')
     .get((req, res) => {
         const id = req.params.id;
-        User.findById(id, ['_id', 'firstName', 'lastName', 'fullName', 'email', 'connections', 'requests', 'pendingRequests'], (err, user) => {
+        User.findById(id, ['_id', 'img', 'firstName', 'lastName', 'fullName', 'email', 'connections', 'requests', 'pendingRequests'], (err, user) => {
             if (err) {
                 console.log(err);
             } else if (!user) {
@@ -195,7 +195,7 @@ app.route('/api/profile/:id')
     // Patch updates the body of the user 
     .patch((req, res) => {
         const id = req.params.id;
-        User.findByIdAndUpdate(id, { $set: req.body }, { new: true, projection: ['_id', 'firstName', 'lastName', 'fullName', 'email'] }, (err, user) => {
+        User.findByIdAndUpdate(id, { $set: req.body }, { new: true, projection: ['_id', 'img', 'firstName', 'lastName', 'fullName', 'email'] }, (err, user) => {
             if (err) {
                 console.log(err);
             } else if (!user) {
@@ -225,14 +225,14 @@ app.route("/api/request/:id")
                 const requests = user.requests.map(item => item.toString());
                 const pending = user.pendingRequests.map(item => item.toString());
                 console.log(requests);
-                User.find({ '_id': { $in: requests } }, ['_id', 'firstName', 'lastName', 'fullName'],
+                User.find({ '_id': { $in: requests } }, ['_id', 'img', 'firstName', 'lastName', 'fullName'],
                     (err, users) => {
                         if (err) {
                             console.log(err);
                         } else if (!users) {
                             console.log("There were no users found");
                         } else {
-                            User.find({ '_id': { $in: pending } }, ['_id', 'firstName', 'lastName', 'fullName'],
+                            User.find({ '_id': { $in: pending } }, ['_id', 'img', 'firstName', 'lastName', 'fullName'],
                                 (err, pendings) => {
                                     if (err) {
                                         console.log(err);
@@ -346,7 +346,7 @@ app.route("/api/connection/:id")
                 console.log("Your account was found");
                 const connections = user.connections.map(connection => connection.toString());
                 //Find the users that have id's in the current users' connections
-                User.find({ '_id': { $in: connections } }, ['_id', 'firstName', 'lastName', 'fullName'],
+                User.find({ '_id': { $in: connections } }, ['_id', 'img', 'firstName', 'lastName', 'fullName'],
                     (err, users) => {
                         if (err) {
                             console.log(err);
@@ -555,7 +555,7 @@ app.route('/api/chat/:user/:other')
                                                                     // let otheruserIds = between;
                                                                     // otheruserIds = otheruserIds.filter(id => id !== userId);
                                                                     console.log(`other user id ${otheruserIds}, user id: ${userId}`);
-                                                                    User.find({ '_id': { $in: otheruserIds } }, ['_id', 'fullName'], (err, users) => {
+                                                                    User.find({ '_id': { $in: otheruserIds } }, ['_id', 'img', 'fullName'], (err, users) => {
                                                                         if (err) {
                                                                             console.log(err);
                                                                         } else {
@@ -584,7 +584,7 @@ app.route('/api/chat/:user/:other')
                                     // let otheruserIds = between;
                                     // otheruserIds = otheruserIds.filter(id => id !== userId);
                                     console.log(`other user id ${otheruserIds}, user id: ${userId}`);
-                                    User.find({ '_id': { $in: otheruserIds } }, ['_id', 'fullName'], (err, users) => {
+                                    User.find({ '_id': { $in: otheruserIds } }, ['_id', 'img', 'fullName'], (err, users) => {
                                         if (err) {
                                             console.log(err);
                                         } else {

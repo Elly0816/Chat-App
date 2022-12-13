@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 import { appContext } from '../App';
+import Picture from './Picture';
 
 
 
@@ -84,8 +85,8 @@ export default function Info(props){
     function handleSubmit(e){
         //console.log('submit clicked');
         e.preventDefault();
-        function changeDetails(){
-            axios.patch(`${endpoint}api/profile/${id}`, {
+        async function changeDetails(){
+            await axios.patch(`${endpoint}api/profile/${id}`, {
                 firstName: profile.firstName,
                 lastName: profile.lastName,
                 fullName: `${profile.firstName} ${profile.lastName}`,
@@ -129,7 +130,7 @@ export default function Info(props){
 
     function acceptRequest(){
         async function accept(){
-            axios.post(`${endpoint}api/connection/${user.user._id}`, {id: id})
+            await axios.post(`${endpoint}api/connection/${user.user._id}`, {id: id})
                 .then(response => {
                 props.changeUser({...user, user: response.data.user})
                 setConnected(true);
@@ -141,7 +142,7 @@ export default function Info(props){
 
     function removeConnection(){
         async function remove(){
-            axios.patch(`${endpoint}api/connection/${user.user._id}`, {id: id})
+            await axios.patch(`${endpoint}api/connection/${user.user._id}`, {id: id})
                 .then(response => {
                     props.changeUser({...user, user: response.data.user})
                     setConnected(false);
@@ -153,15 +154,24 @@ export default function Info(props){
     }
     
     //Creates or returns chat between two users
-    function createChat(){
-        axios.get(`${endpoint}api/chat/${user.user._id}/${profile._id}`)
+    async function createChat(){
+        await axios.get(`${endpoint}api/chat/${user.user._id}/${profile._id}`)
         .then(response => {
             //console.log(response);
             navigate("/");
         })
     }
 
+    //helps with uploading images to the 
+
     return <div className='infoPage not-header'>
+                    <Picture 
+                    src={profile.img?.data ? profile.img.data : 'def-prof-pic.jpg'} 
+                    alt={profile.fullName} 
+                    mine={isUser ? 'profile-img mine' : 'profile-img'}
+                    onClick={isUser ? null : null}
+                    title={isUser ? 'change profile picture' : `${profile.fullName}'s profile picture`}
+                    />
                     <h2>{profile.fullName}</h2>
                     <div className='info'>
                     <div className='info-1'>

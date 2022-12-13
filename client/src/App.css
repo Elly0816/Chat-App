@@ -334,3 +334,14 @@ a {
 .people {
     padding: 2%;
 }
+
+.mine:hover {
+    /* background-image: url('../public/add.jpg'); */
+    border: 5px solid grey;
+}
+
+.profile-img {
+    border-radius: 50%;
+    width: 20%;
+    margin: 0 50px;
+}
