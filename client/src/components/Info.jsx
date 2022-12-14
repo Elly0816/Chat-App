@@ -167,9 +167,11 @@ export default function Info(props){
 
     //helps with uploading images to the server
     function uploadImage(e){
-        console.log(e.target.files);
-        setImageToUpload(URL.createObjectURL(e.target.files[0]));
-    };
+        if (e.target.files.length !== 0){
+            // console.log(e.target.files);
+            setImageToUpload({image: URL.createObjectURL(e.target.files[0])});
+        }
+            };
 
     //this helps with picking the image
     const inputRef = useRef(null);
@@ -184,7 +186,7 @@ export default function Info(props){
                     inputRef={inputRef}
                     handleClick={isUser && pickImage} 
                     divClassName='p-p-div'
-                    src={profile.img?.data ? profile.img.data : imageToUpload ? imageToUpload : 'def-prof-pic.jpg'} 
+                    src={profile.img?.data ? profile.img.data : imageToUpload?.image ? imageToUpload.image : 'def-prof-pic.jpg'} 
                     alt={profile.fullName}
                     canInput = {isUser && true} 
                     mine={isUser ? 'profile-img mine' : 'profile-img'}
