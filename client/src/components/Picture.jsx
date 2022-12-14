@@ -7,5 +7,9 @@ export default function Picture(props){
 
 
 
-    return <img onClick={props.onClick} title={props.title} className={props.mine} src={props.src} alt={props.alt + ' profile image'}></img>
+    return <div className={props.divClassName}>
+        <img onClick={props.handleClick ? props.handleClick : () => {}} className={props.mine} title={props.title} src={props.src} alt={props.alt + ' profile image'}></img>
+        {props.canInput && <input style={{display: 'none'}} ref={props.inputRef} accept="image/*" title={props.title} src={props.src} alt='change profile picture' type='file' onChange={props.handleChange}/>}
+        {/* {props.canInput && <button onClick={props.handleClick}>Change Image</button>} */}
+    </div>
 }

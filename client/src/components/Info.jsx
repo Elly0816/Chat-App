@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
@@ -28,6 +28,9 @@ export default function Info(props){
 
     //Keeps track on if the profile user sent a request
     const [ requestSent, setRequestSent ] = useState(false);
+
+    //This is the image to upload
+    const [imageToUpload, setImageToUpload] = useState(null);
 
     const {socket, user, endpoint} = useContext(appContext);
 
@@ -162,14 +165,30 @@ export default function Info(props){
         })
     }
 
-    //helps with uploading images to the 
+    //helps with uploading images to the server
+    function uploadImage(e){
+        console.log(e.target.files);
+        setImageToUpload(URL.createObjectURL(e.target.files[0]));
+    };
+
+    //this helps with picking the image
+    const inputRef = useRef(null);
+
+    function pickImage(){
+        inputRef.current.click();
+    };
+
 
     return <div className='infoPage not-header'>
-                    <Picture 
-                    src={profile.img?.data ? profile.img.data : 'def-prof-pic.jpg'} 
-                    alt={profile.fullName} 
+                    <Picture
+                    inputRef={inputRef}
+                    handleClick={isUser && pickImage} 
+                    divClassName='p-p-div'
+                    src={profile.img?.data ? profile.img.data : imageToUpload ? imageToUpload : 'def-prof-pic.jpg'} 
+                    alt={profile.fullName}
+                    canInput = {isUser && true} 
                     mine={isUser ? 'profile-img mine' : 'profile-img'}
-                    onClick={isUser ? null : null}
+                    handleChange={uploadImage}
                     title={isUser ? 'change profile picture' : `${profile.fullName}'s profile picture`}
                     />
                     <h2>{profile.fullName}</h2>

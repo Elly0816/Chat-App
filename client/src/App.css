@@ -341,7 +341,13 @@ a {
 }
 
 .profile-img {
-    border-radius: 50%;
+    border-radius: 100%;
     width: 20%;
+    aspect-ratio: initial;
     margin: 0 50px;
+}
+
+.p-p-div {
+    display: flex;
+    flex-direction: column;
 }
