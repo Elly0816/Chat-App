@@ -9,6 +9,8 @@ const url = process.env.NODE_ENV === 'production' ? process.env.MONGO : "mongodb
 
 mongoose.connect(url);
 
+// mongoose.set('strictQuery', true)
+
 // console.log(`the url is ${url}`);
 
 

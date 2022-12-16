@@ -1,49 +1,27 @@
-// const express = require('express');
-// const app = express();
-// const cors = require('cors');
-// const session = require('express-session');
-// const path = require('path');
 const { app, server } = require('./socket');
 const { User, Message, Chat } = require('./database.js');
 const { send } = require('./functions.js');
 const jwt = require('jsonwebtoken');
-// const http = require('http');
-// const { Server } = require('socket.io');
 require('dotenv').config({ path: '../.env' });
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
-// const { server } = require('./socket');
 
 const port = process.env.PORT || 5000;
 
-// console.log(`the port is ${port}`);
-
-// app.use(cors());
-// app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());
-// app.set('trust proxy', 1)
-// app.use(session({
-//     secret: process.env.SECRET,
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: { secure: true }
-// }));
-// app.use(passport.initialize());
-// app.use(passport.session());
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads');
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${file.fieldname}-${Date.now()} ${path.extname(file.originalname)}`)
+    }
+});
 
 
-// app.use(express.static(path.join(__dirname, 'client/build')));
+const upload = multer({ storage: storage });
 
-// const port = process.env.PORT || 5000;
-
-// const server = http.createServer(app);
-
-// /*Creates the websocket */
-// const io = new Server(server, {
-//     cors: {
-//         origin: process.env.CLIENT,
-//         methods: ["GET", "POST"]
-//     }
-// });
 
 
 
@@ -631,6 +609,13 @@ app.route('/api/messages/:id')
         });
     });
 
+//This route is for uploading your profile picture
+app.post('/api/profImgUpload/:id', upload.single('image'), (req, res) => {
+    const userId = req.params.id;
+    console.log(userId);
+    console.log(req.file);
+    res.send('hit the api successfully');
+})
 
 server.listen(port, () => {
     console.log(`Server up and running at ${port}`);

@@ -32,6 +32,12 @@ export default function Info(props){
     //This is the image to upload
     const [imageToUpload, setImageToUpload] = useState(null);
 
+    //This shows the image for the user
+    const [imageToShow, setImageToShow] = useState(null);
+
+    //This state shows an upload button
+    const [toUpload, setToUpload] = useState(null);
+
     const {socket, user, endpoint} = useContext(appContext);
 
 
@@ -166,17 +172,32 @@ export default function Info(props){
     }
 
     //helps with uploading images to the server
-    function uploadImage(e){
+    function pickImage(e){
         if (e.target.files.length !== 0){
+            setImageToShow({image: URL.createObjectURL(e.target.files[0])});
             // console.log(e.target.files);
-            setImageToUpload({image: URL.createObjectURL(e.target.files[0])});
+            const formData = new FormData();
+            formData.append('image', e.target.files[0]);
+            setImageToUpload(formData);
+            setToUpload(true);
         }
             };
+
+    //This uploads the image to the server
+    async function uploadImage(){
+        console.log(imageToUpload.values());
+        await axios.post(`${endpoint}api/profImgUpload/${user.user._id}`, imageToUpload, 
+        {headers: {'Content-Type': 'multipart/form-data'}})
+        .then(res => {
+            console.log(res);
+        })
+        setToUpload(false);
+    }
 
     //this helps with picking the image
     const inputRef = useRef(null);
 
-    function pickImage(){
+    function clickInput(){
         inputRef.current.click();
     };
 
@@ -184,15 +205,16 @@ export default function Info(props){
     return <div className='infoPage not-header'>
                     <Picture
                     inputRef={inputRef}
-                    handleClick={isUser && pickImage} 
+                    handleClick={isUser && clickInput} 
                     divClassName='p-p-div'
-                    src={profile.img?.data ? profile.img.data : imageToUpload?.image ? imageToUpload.image : 'def-prof-pic.jpg'} 
+                    src={profile.img?.data ? profile.img.data : imageToShow?.image ? imageToShow.image : 'def-prof-pic.jpg'} 
                     alt={profile.fullName}
                     canInput = {isUser && true} 
                     mine={isUser ? 'profile-img mine' : 'profile-img'}
-                    handleChange={uploadImage}
+                    handleChange={pickImage}
                     title={isUser ? 'change profile picture' : `${profile.fullName}'s profile picture`}
                     />
+                    {toUpload && <button onClick={uploadImage} className='upload-button'>Upload Image</button>}
                     <h2>{profile.fullName}</h2>
                     <div className='info'>
                     <div className='info-1'>

@@ -351,3 +351,17 @@ a {
     display: flex;
     flex-direction: column;
 }
+
+.upload-button {
+    border-radius: 10%;
+    margin-left: 75px;
+    margin-top: 10px;
+    background-color: #0984e3;
+    color: white;
+    font-weight: bold;
+}
+
+.upload-button:hover {
+    background-color: white;
+    color: #0984e3;
+}
