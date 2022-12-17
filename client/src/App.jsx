@@ -10,6 +10,7 @@ import Info from './components/Info';
 import People from './components/People';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { createContext } from 'react';
+import { Buffer } from 'buffer';
 
 
 
@@ -26,6 +27,9 @@ function App() {
   const [ socket, setSocket ] = useState();
 
   const [ user, setUser ] = useState({auth: null, user: {}});
+
+  //This state stores the user's profile image
+  const [profileImage, setProfileImage] = useState();
 
   
   /*This checks if a user has previously logged in */
@@ -60,6 +64,12 @@ function App() {
       if (!socket){
         setSocket(io.connect(endpoint));
       }
+    }
+    if (user.user?.img){
+      const image = `data:${user.user.img.contentType};base64,${Buffer.from(user.user.img.data.data).toString('base64')}`;
+      setProfileImage(image);
+    } else {
+      setProfileImage('def-prof-pic.jpg');
     }
   }, [user]);
 
@@ -96,7 +106,7 @@ function App() {
   return (
     <div className='app'>
       <Router>
-        <appContext.Provider value={{socket, user, endpoint}}>
+        <appContext.Provider value={{socket, user, endpoint, setUser, profileImage}}>
           { user.auth && <Header logout={ authenticate }/>}
           <Routes>
             <Route path="/profile/:id" element={<Info changeUser={ authenticate } /> } />

@@ -172,7 +172,7 @@ io.on('connection', (socket) => {
                     socket.emit('search', 'No users found');
                 } else {
                     socket.emit('search', users);
-                    console.log(users);
+                    // console.log(users);
                 }
             }
         });

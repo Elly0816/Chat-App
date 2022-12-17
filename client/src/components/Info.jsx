@@ -5,10 +5,13 @@ import { Form } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 import { appContext } from '../App';
 import Picture from './Picture';
+import { Buffer } from 'buffer';
 
 
 
 export default function Info(props){
+    const {setUser, user, endpoint, profileImage} = useContext(appContext);
+
 
     const {id} = useParams();
 
@@ -33,12 +36,10 @@ export default function Info(props){
     const [imageToUpload, setImageToUpload] = useState(null);
 
     //This shows the image for the user
-    const [imageToShow, setImageToShow] = useState(null);
+    const [imageToShow, setImageToShow] = useState({image: profileImage});
 
     //This state shows an upload button
     const [toUpload, setToUpload] = useState(null);
-
-    const {socket, user, endpoint} = useContext(appContext);
 
 
     /*This gets the details of the user whose id matches the id of use params */
@@ -57,37 +58,41 @@ export default function Info(props){
                 }
                 
                 })
+                .then(() => {
+                    if (!isUser){
+                        if (profile.img?.data?.data){
+                            const image = `data:${profile.img.contentType};base64,${Buffer.from(profile.img.data.data).toString('base64')}`;
+                            console.log(profile.img.contentType);
+                            setImageToShow({image: image});
+                        }
+                        if(profile._id){
+                            if ((profile.connections.includes(user.user._id)) || 
+                            (profile.requests.includes(user.user._id))) {
+                            setReqDisabled(true);
+                            } else {
+                                setReqDisabled(false);
+                            }
+                            if (profile.connections.includes(user.user._id)) {
+                                setConnected(true);
+                            } else {
+                                setConnected(false);
+                            }
+                            if (profile.pendingRequests.includes(user.user._id)){
+                                setRequestSent(true);
+                            } else {
+                                setRequestSent(false);
+                            }
+                        }
+                    } else {
+                        setImageToShow({image: profileImage});
+                    }
+                })
             .catch(err => {
                 console.log(err);
             });
         }
-        getDetails();
-        
+        getDetails()
     }, [id, profile._id, user.user.firstName, user.user.lastName, user.user.email]);
-
-
-    //useEffect to change buttons that show on the page
-    useEffect(() => {
-        if(profile._id){
-            if ((profile.connections.includes(user.user._id)) || 
-            (profile.requests.includes(user.user._id))) {
-            setReqDisabled(true);
-            } else {
-                setReqDisabled(false);
-            }
-            if (profile.connections.includes(user.user._id)) {
-                setConnected(true);
-            } else {
-                setConnected(false);
-            }
-            if (profile.pendingRequests.includes(user.user._id)){
-                setRequestSent(true);
-            } else {
-                setRequestSent(false);
-            }
-        }
-        
-    } ,[profile._id]);
 
 
     /*Function to change the details of the user */
@@ -189,7 +194,10 @@ export default function Info(props){
         await axios.post(`${endpoint}api/profImgUpload/${user.user._id}`, imageToUpload, 
         {headers: {'Content-Type': 'multipart/form-data'}})
         .then(res => {
-            console.log(res);
+            console.log(res.data.response);
+            const userResponse = res.data.response;
+            setUser({...user, user: userResponse});
+            navigate(`/profile/${user.user._id}`);
         })
         setToUpload(false);
     }
@@ -207,7 +215,7 @@ export default function Info(props){
                     inputRef={inputRef}
                     handleClick={isUser && clickInput} 
                     divClassName='p-p-div'
-                    src={profile.img?.data ? profile.img.data : imageToShow?.image ? imageToShow.image : 'def-prof-pic.jpg'} 
+                    src={imageToShow.image}
                     alt={profile.fullName}
                     canInput = {isUser && true} 
                     mine={isUser ? 'profile-img mine' : 'profile-img'}

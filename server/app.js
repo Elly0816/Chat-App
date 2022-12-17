@@ -82,7 +82,7 @@ app.post('/api/register', (req, res) => {
                                     console.log('Registering, redirecting to messages page');
                                     //Jwt of the user
                                     token = jwt.sign({ id: user._id }, process.env.SECRET, { expiresIn: '1h' });
-                                    console.log(user);
+                                    // console.log(user);
                                     res.send({ token: token, user: user });
                                 }
                             });
@@ -115,7 +115,7 @@ app.post('/api/login', (req, res) => {
                 } else {
                     console.log("Logged in");
                     token = jwt.sign({ id: user._id }, process.env.SECRET, { expiresIn: '1h' });
-                    console.log(user);
+                    // console.log(user);
                     res.send({ token: token, user: user });
                 }
             });
@@ -165,7 +165,7 @@ app.route('/api/profile/:id')
                 console.log("This user does not exist");
                 res.send({ response: 'User not found!' });
             } else {
-                console.log(`This is the user: ${user}`);
+                // console.log(`This is the user: ${user}`);
                 res.send({ response: user });
             }
         });
@@ -482,7 +482,7 @@ app.route('/api/chat/:user/:other')
             } else if (!user) {
                 console.log("The current user was not found while checking if connections exists");
             } else {
-                console.log(user);
+                // console.log(user);
                 const connections = user.connections;
                 if (connections.includes(mongoose.Types.ObjectId(otherId))) {
                     // Find the chat between the current user and the other user
@@ -614,7 +614,25 @@ app.post('/api/profImgUpload/:id', upload.single('image'), (req, res) => {
     const userId = req.params.id;
     console.log(userId);
     console.log(req.file);
-    res.send('hit the api successfully');
+    const imageObject = {
+        data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)),
+        contentType: 'image/png'
+    };
+    User.findByIdAndUpdate(userId, { $set: { img: imageObject } }, { new: true }, (err, user) => {
+        if (err) {
+            console.log('There was an error');
+        } else if (!user) {
+            console.log('The user was not found');
+        } else {
+            try {
+                fs.unlinkSync(path.join(__dirname + '/uploads/' + req.file.filename));
+                console.log('Deleted image from storage successfully');
+            } catch (err) {
+                console.log(err);
+            }
+            res.send({ response: user });
+        }
+    })
 })
 
 server.listen(port, () => {
