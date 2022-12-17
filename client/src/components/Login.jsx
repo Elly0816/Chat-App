@@ -8,7 +8,7 @@ import { appContext } from '../App';
 
 export default function Login(props){
 
-    const {socket, user, endpoint} = useContext(appContext);
+    const {endpoint} = useContext(appContext);
 
     const navigate = useNavigate();
 

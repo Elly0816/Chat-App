@@ -36,7 +36,7 @@ export default function Info(props){
     const [imageToUpload, setImageToUpload] = useState(null);
 
     //This shows the image for the user
-    const [imageToShow, setImageToShow] = useState({image: profileImage});
+    const [imageToShow, setImageToShow] = useState({image: null});
 
     //This state shows an upload button
     const [toUpload, setToUpload] = useState(null);

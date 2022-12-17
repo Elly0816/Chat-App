@@ -20,7 +20,7 @@ export default function People(props){
 
     const navigate = useNavigate();
 
-    const {socket, user, endpoint} = useContext(appContext);
+    const {user, endpoint} = useContext(appContext);
 
     useEffect(() => {
         async function getPeople(){

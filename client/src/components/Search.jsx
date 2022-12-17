@@ -12,7 +12,7 @@ export default function Search(props){
 
     const [ users, setUsers ] = useState([]);
 
-    const {socket, user, endpoint} = useContext(appContext);
+    const {socket} = useContext(appContext);
 
 /*Searches the database for the users matching the input in the form via websocket */
     function handleChange(e){

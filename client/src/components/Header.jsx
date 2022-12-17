@@ -39,7 +39,7 @@ export default function Header(props) {
         navigate(`/profile/${user.user._id}`);
     };
 
-    const {socket, user, endpoint} = useContext(appContext);
+    const {user, endpoint} = useContext(appContext);
 
 
     return <div className='header'>

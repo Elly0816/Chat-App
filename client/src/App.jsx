@@ -65,7 +65,7 @@ function App() {
         setSocket(io.connect(endpoint));
       }
     }
-    if (user.user?.img){
+    if (user.user?.img?.data?.data){
       const image = `data:${user.user.img.contentType};base64,${Buffer.from(user.user.img.data.data).toString('base64')}`;
       setProfileImage(image);
     } else {
