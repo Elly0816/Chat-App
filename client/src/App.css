@@ -336,7 +336,6 @@ a {
 }
 
 .mine:hover {
-    /* background-image: url('../public/add.jpg'); */
     border: 5px solid grey;
 }
 
