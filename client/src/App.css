@@ -69,8 +69,8 @@ body {
 .loginPage {
     display: grid;
     padding: 0.5%;
-    min-height: 100%;
-    max-width: 100%;
+    min-height: 100vh;
+    max-width: 100vw;
 }
 
 .loginSide {
