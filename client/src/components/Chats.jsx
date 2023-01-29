@@ -11,7 +11,7 @@ export default function Chats(props){
 
   const [toShow, setToShow] = useState();
   
-  const [filter, setFilter] = useState();
+  const [filter, setFilter] = useState("");
 
 //   const [unread, setUnread] = useState();
 
@@ -20,8 +20,14 @@ export default function Chats(props){
    setChats(props.items)
   }, [props.items]);
 
+
   useEffect(() => {
-   setToShow(chats);
+   if (chats){
+      const chatsToShow = chats.sort((a, b) =>  
+         Date.parse(b[1].lastMessageTime) - Date.parse(a[1].lastMessageTime)
+      )
+      setToShow(chatsToShow);
+   }
   }, [chats])
 
   

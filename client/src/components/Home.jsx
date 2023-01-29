@@ -60,7 +60,9 @@ export default function Home(props){
             const people = arg.otherUsers;
             const unreads = arg.unreads;
             // const peopleAndChats = people.map((person, index) => [person, chats[index], unreads[index]]);
+            // const chatsAndPeople = chats.sort((a, b) => b.lastMessageTime - a.lastMessageTime)
             const peopleAndChats = people.map((person, index) => [person, chats[index], chats[index]._id === currentChatId? 0 : unreads[index]]);
+            // .sort((person, chats, index) => chats[index + 1].lastMessageTime[index]);
             setItems(peopleAndChats);
         });
     };

@@ -87,7 +87,7 @@ io.on('connection', (socket) => {
             } else if (!message) {
                 console.log("The message to delete was not found");
             } else {
-                Chat.findById(chatId, (err, chat) => {
+                Chat.findByIdAndUpdate(chatId, { $set: { lastMessageTime: Date.now() } }, (err, chat) => {
                     if (err) {
                         console.log(err);
                     } else if (!chat) {
@@ -128,7 +128,10 @@ io.on('connection', (socket) => {
             if (err) {
                 console.log(err);
             } else {
-                Chat.findByIdAndUpdate(chatId, { $push: { messages: message._id } }, { new: true }, (err, chat) => {
+                Chat.findByIdAndUpdate(chatId, {
+                    $push: { messages: message._id },
+                    $set: { lastMessageTime: Date.now() }
+                }, { new: true }, (err, chat) => {
                     if (err) {
                         console.log(err);
                     } else {

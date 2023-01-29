@@ -26,7 +26,8 @@ const messageSchema = new mongoose.Schema({
 /*Chat Schema*/
 const chatSchema = new mongoose.Schema({
     between: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }]
+    messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }],
+    lastMessageTime: { type: Date, default: Date.now }
 });
 
 /*User Schema */
