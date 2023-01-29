@@ -453,7 +453,7 @@ app.route('/api/chats/:user')
                     } else {
                         const otherUsers = chats.map(chat => chat.between.filter(id => id.toString() !== userId)).map(id => id.toString());
                         console.log(otherUsers);
-                        User.find({ '_id': { $in: otherUsers } }, 'fullName', (err, users) => {
+                        User.find({ '_id': { $in: otherUsers } }, ['fullName', 'img'], (err, users) => {
                             if (err) {
                                 console.log(err);
                             } else {

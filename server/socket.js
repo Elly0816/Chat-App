@@ -39,9 +39,9 @@ const io = new Server(server, {
     cors: {
         origin: process.env.CLIENT,
         methods: ["GET", "POST"]
-    }
+    },
+    transports: ['polling', 'websocket']
 });
-
 
 
 

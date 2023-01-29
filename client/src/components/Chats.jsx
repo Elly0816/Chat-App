@@ -2,6 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import Unread from './Unread';
+import {Buffer} from 'buffer';
 
 
 
@@ -17,18 +18,22 @@ export default function Chats(props){
 
   
   useEffect(() => {
-   setChats(props.items)
+   if (props.items){
+      const chatsToShow = props.items.sort((a, b) =>  
+            Date.parse(b[1].lastMessageTime) - Date.parse(a[1].lastMessageTime)
+         )
+      setChats(chatsToShow);
+      setToShow(chatsToShow);
+   }
   }, [props.items]);
 
 
-  useEffect(() => {
-   if (chats){
-      const chatsToShow = chats.sort((a, b) =>  
-         Date.parse(b[1].lastMessageTime) - Date.parse(a[1].lastMessageTime)
-      )
-      setToShow(chatsToShow);
-   }
-  }, [chats])
+//   useEffect(() => {
+      // const chatsToShow = chats.sort((a, b) =>  
+      //    Date.parse(b[1].lastMessageTime) - Date.parse(a[1].lastMessageTime)
+      // )
+      // setToShow(chats);
+//   }, [chats])
 
   
   
@@ -76,6 +81,10 @@ export default function Chats(props){
               
             </span> */}
             <h6>{item[0].fullName}</h6>
+            <img className='chat-image' src={item[0]?.img ? 
+            `data:${item[0].img.contentType};base64,${Buffer.from(item[0].img.data.data).toString('base64')}` : 
+            'def-prof-pic.jpg'
+            } alt="" />
             { item[2] > 0 && <Unread unread={item[2]}/>}
          </button>
       </div>

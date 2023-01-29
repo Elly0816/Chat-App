@@ -62,7 +62,7 @@ function App() {
   useEffect(() => {
     if ( user.auth ){
       if (!socket){
-        setSocket(io.connect(endpoint));
+        setSocket(io.connect(endpoint, {transports:['websocket'], upgrade:false}));
       }
     }
     if (user.user?.img?.data?.data){
@@ -78,6 +78,8 @@ function App() {
   //This handles the sending of the socket id and the user id to the server
   useEffect(()=>{
     if(socket){
+      console.log('This is the socket');
+      console.log(socket);
       //Emit an event to add the socket id to the user's socket field
       const add = {userId: user.user._id}
       socket.emit('add', add);
@@ -89,18 +91,16 @@ function App() {
     sendMessage = (toSend) => {
       socket.emit('send',toSend);
     }
+
+    socket.on('play', () => {
+      new Audio('sounds/new message notification.wav').play();
+    });
   }
 
 
   function authenticate(status){
    setUser(status);
   };
-
-  if (socket){
-    socket.on('play', () => {
-      new Audio('sounds/new message notification.wav').play();
-    });
-  }
 
 
   return (

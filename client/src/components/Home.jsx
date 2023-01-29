@@ -106,20 +106,22 @@ export default function Home(props){
 
     //This initally loads up the messages chat from the database
     function getMessages(id, otherUserName, otherUserId) {
-        axios.get(`${endpoint}api/messages/${id}`)
-        .then(response => {
-            if (!response.data.messages){
-                //console.log(response.data);
-                setMessages([{text: `Start a chat with ${otherUserName}`}]);
-            } else {
-                //console.log(response.data.messages)
-                // console.log('This is in the get messages function');
-                console.log(response.data.messages);
-                setMessages(response.data.messages);
-                socket.emit('seen', {chatId: id, userId: user.user._id, otherUserId: otherUserId});
-            }
-        })
-        .catch(err => console.log(err));
+        if (id !== currentChatId){
+            axios.get(`${endpoint}api/messages/${id}`)
+            .then(response => {
+                if (!response.data.messages){
+                    //console.log(response.data);
+                    setMessages([{text: `Start a chat with ${otherUserName}`}]);
+                } else {
+                    //console.log(response.data.messages)
+                    // console.log('This is in the get messages function');
+                    console.log(response.data.messages);
+                    setMessages(response.data.messages);
+                    socket.emit('seen', {chatId: id, userId: user.user._id, otherUserId: otherUserId});
+                }
+            })
+            .catch(err => console.log(err));
+        }
     }
 
     //This sets the id of the chat to load messages from in the Entry component
