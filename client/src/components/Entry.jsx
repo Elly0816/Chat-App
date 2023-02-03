@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { ArrowRight } from 'react-bootstrap-icons';
@@ -8,6 +8,12 @@ import { ArrowRight } from 'react-bootstrap-icons';
 export default function Entry(props){
 
     const [ message, setMessage ] = useState("");
+    const inputRef = useRef(null);
+    
+    useEffect(()=>{
+        inputRef.current.focus();
+    });
+
 
     function handleChange(e){
         setMessage(e.target.value);
@@ -30,7 +36,7 @@ export default function Entry(props){
     return <div className='entry'>
         <Form className='entry-form' onSubmit={handleSubmit}>
             <Form.Group className="mb-12" controlId="exampleForm.ControlTextarea1">
-                <Form.Control autoComplete='off' value={message} onChange={handleChange} rows={3} placeholder="Write a message..."/>
+                <Form.Control ref={inputRef} autoComplete='off' value={message} onChange={handleChange} rows={3} placeholder="Write a message..."/>
             </Form.Group>
         </Form>
         <Button onClick={handleSubmit} className='button' variant='primary' type='submit' ><ArrowRight /></Button>

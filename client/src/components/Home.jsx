@@ -20,9 +20,11 @@ export default function Home(props){
     const {socket, user, endpoint } = useContext(appContext);
 
     useEffect(()=>{
+        const controller = new AbortController();
+        const {signal} = controller;
         async function getChats(){
             //console.log(`${endpoint}chats/${user.user._id}`);
-            await axios.get(`${endpoint}api/chats/${user.user._id}`)
+            await axios.get(`${endpoint}api/chats/${user.user._id}`, {signal})
             .then(response => {
                 console.log(response.data);
                 const chats = response.data.chats;
@@ -34,6 +36,7 @@ export default function Home(props){
             .catch(err => console.log(err));
         }
         getChats();
+        return () => controller.abort();
     }, []);
 
 

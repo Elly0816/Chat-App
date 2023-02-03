@@ -31,6 +31,9 @@ function App() {
   //This state stores the user's profile image
   const [profileImage, setProfileImage] = useState();
 
+  //The sound that plays for incoming messages
+  const ringtone = new Audio('sounds/new message notification.wav');
+
   
   /*This checks if a user has previously logged in */
   useEffect(() => {
@@ -92,8 +95,9 @@ function App() {
       socket.emit('send',toSend);
     }
 
+
     socket.on('play', () => {
-      new Audio('sounds/new message notification.wav').play();
+      ringtone.play();
     });
   }
 

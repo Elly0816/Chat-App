@@ -19,6 +19,9 @@ export default function Chats(props){
   
   useEffect(() => {
    if (props.items){
+      /*
+      This sorts the chats in order of most recently received message
+      */
       const chatsToShow = props.items.sort((a, b) =>  
             Date.parse(b[1].lastMessageTime) - Date.parse(a[1].lastMessageTime)
          )

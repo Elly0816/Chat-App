@@ -44,8 +44,10 @@ export default function Info(props){
 
     /*This gets the details of the user whose id matches the id of use params */
     useEffect(() => {
+        const controller = new AbortController();
+        const {signal} = controller;
         async function getDetails(){
-            await axios.get(`${endpoint}api/profile/${id}`)
+            await axios.get(`${endpoint}api/profile/${id}`, {signal})
             .then( response => {
                 //console.log(response.data.response);
                 setProfile(response.data.response);
@@ -92,6 +94,7 @@ export default function Info(props){
             });
         }
         getDetails()
+        return () => controller.abort();
     }, [id, profile._id, user.user.firstName, user.user.lastName, user.user.email]);
 
 

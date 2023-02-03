@@ -23,9 +23,11 @@ export default function People(props){
     const {user, endpoint} = useContext(appContext);
 
     useEffect(() => {
+        const controller = new AbortController();
+        const {signal} = controller;
         async function getPeople(){
             if (request !== 'pendingRequests') {
-                await axios.get(`${endpoint}api/${request}/${id}`)
+                await axios.get(`${endpoint}api/${request}/${id}`, {signal})
                 .then(response => 
                 {   
                     setTitle(`${lodash.capitalize(request)}s`);
@@ -35,7 +37,7 @@ export default function People(props){
                 )
                 .catch(err => console.log(err));
             } else {
-                await axios.get(`${endpoint}api/request/${id}`)
+                await axios.get(`${endpoint}api/request/${id}`, {signal})
                 .then(response => 
                 {   setTitle('Pending Requests');
                     setPeople(response.data.pending);
@@ -47,6 +49,8 @@ export default function People(props){
             
         }
         getPeople();
+        return () => controller.abort();
+        
     }, [id, request, user, endpoint]);
 
     function handleClick(id, todo){
