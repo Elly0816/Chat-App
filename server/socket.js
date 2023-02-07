@@ -8,7 +8,7 @@ const { Server } = require('socket.io');
 // const { io } = require('./app.js');
 // const http = require('http');
 // const { Server } = require('socket.io');
-const { User, Message, Chat, passport } = require('./database');
+const { User, Message, Chat, passport } = require('./schemas');
 const { otherSocketSend, socketSend, messagesHaveBeenRead } = require('./functions');
 // const { Server } = require('socket.io');
 require('dotenv').config();

@@ -3,28 +3,21 @@ import React, { useState } from 'react';
 import Search from './Search';
 import { Search as SearchIcon } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+// import axios from 'axios';
 import Dropdown from './Dropdown';
 import { appContext } from '../App';
 import { useContext } from 'react';
+import logoutController from '../controllers/userLogoutController';
 
 
 
 export default function Header(props) {
 
     const navigate = useNavigate();
+    const {user, endpoint} = useContext(appContext);
 
     function logout(){
-        async function out(){
-            await axios.post(`${endpoint}api/logout`)
-            .then(response => {
-                props.logout(false);
-                localStorage.clear();
-                navigate("/login");
-            })
-            .catch(err => console.log(err));
-        }
-        out();     
+        logoutController(endpoint, navigate, props.logout);  
     }
 
     const [ openSearch, setOpenSearch ] = useState(false);
@@ -39,7 +32,6 @@ export default function Header(props) {
         navigate(`/profile/${user.user._id}`);
     };
 
-    const {user, endpoint} = useContext(appContext);
 
 
     return <div className='header'>

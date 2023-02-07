@@ -33,7 +33,9 @@ export default function Home(props){
                 const peopleAndChats = people.map((person, index) => [person, chats[index], unread[index]]);
                 setItems(peopleAndChats);
             })
-            .catch(err => console.log(err));
+            .catch((err) => {
+                console.log(err);
+            });
         }
         getChats();
         return () => controller.abort();

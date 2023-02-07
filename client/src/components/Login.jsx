@@ -5,6 +5,10 @@ import axios from 'axios';
 import Footer from './Footer';
 import { useNavigate } from 'react-router-dom';
 import { appContext } from '../App';
+import registerController from "../controllers/userRegisterController";
+import loginController from "../controllers/userLoginController";
+
+
 
 export default function Login(props){
 
@@ -53,16 +57,10 @@ export default function Login(props){
         e.preventDefault();
         /*This handles registeration */
         if (register){
-            const { firstName, lastName, email, password, password2 } = form;
+            const { password, password2 } = form;
             if ( password === password2 ){
-                await axios.post(`${endpoint}api/register`, {
-                    firstName: firstName,
-                    lastName: lastName,
-                    email: email,
-                    password: password
-                })
+                registerController(endpoint, form)
                 .then(response => {
-                    //console.log(response.data);
                     if (response.data.response === 'login'){
                         setRegister(false);
                         setExists(true);
@@ -73,28 +71,24 @@ export default function Login(props){
                         //console.log(response.data.user);
                         /*This saves the user to the local storage for login persistence*/
                         localStorage.setItem('user', JSON.stringify(response.data.user));
-                        axios.defaults.headers.common['Authorization'] = 
+                        axios.defaults.headers.common['authorization'] = 
                         'Bearer'+response.data.token;
                         props.authenticate({auth: true, user: response.data.user});
                         navigate("/");
                     }
                 })
-                .catch(err => console.log(err));
-            }
-            else {
+                .catch(err => {
+                    console.log(err);
+                })
+            } else {
                 setPasswordSame(false);
                 setTimeout(() => { setPasswordSame(true) }, 6000);
             }
-        }
-        else {
+        } else {
             /*This handles login */
-            const { email, password } = form;
-            await axios.post(`${endpoint}api/login`, {
-                email: email,
-                password: password
-            })
-            .then(response => { 
-                //console.log(response);
+            loginController(endpoint, form)
+            .then(response => {
+                console.log(response);
                 if (response.data.response === 'login'){
                     setRegister(false);
                 } else if (response.data.response === 'Incorrect Credentials'){
@@ -103,13 +97,17 @@ export default function Login(props){
                     //console.log(response.data.user);
                     /*This saves the user to the local storage for login persistence*/
                     localStorage.setItem('user', JSON.stringify(response.data.user));
+                    localStorage.setItem('token', JSON.stringify(response.data.token));
                     axios.defaults.headers.common['Authorization'] =
-                    'Bearer'+response.data.token;
+                    `Bearer ${response.data.token}`;
+
                     props.authenticate({auth: true, user: response.data.user});
                     navigate('/');
                 }
-             })
-             .catch(err => console.log(err));
+            })
+            .catch(err => {
+                console.log(err);
+            })
         }
     }
     

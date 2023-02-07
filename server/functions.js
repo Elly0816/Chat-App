@@ -1,4 +1,4 @@
-const { User, Message, Chat } = require('./database');
+const { User, Message, Chat } = require('./schemas');
 
 
 //This handles the sending of the unreads to the client
@@ -108,9 +108,50 @@ async function otherSocketSend(otherUserId, io) {
 };
 
 
+function authenticateToken(req, res, jwt) {
+    console.log("Authenticating token");
+    console.log(req.headers);
+    const bearerHeader = req.headers['authorization'];
+    console.log(bearerHeader);
+
+    if (!bearerHeader) {
+        console.log("There was not authorization header");
+        req.logOut((err) => {
+            if (err) {
+                console.log(err);
+            }
+        });
+        res.status(401).send('Unauthorized');
+        return false
+    } else {
+        const bearer = bearerHeader.split(" ");
+        const bearerToken = bearer[1];
+        console.log("Here is the bearer token");
+        console.log(bearerToken);
+
+        try {
+            const decoded = jwt.verify(bearerToken, process.env.SECRET);
+            console.log("Here is the decoded bearer token");
+            // res.send(decoded);
+            console.log(decoded);
+            return true;
+        } catch (error) {
+            req.logOut((err) => {
+                if (err) {
+                    console.log(err);
+                }
+            });
+            res.status(401).send('Unauthorized');
+            console.log("Unauthorized");
+            return false;
+        }
+    }
+}
+
 module.exports = {
     otherSocketSend,
     socketSend,
     messagesHaveBeenRead,
-    send
+    send,
+    authenticateToken
 };

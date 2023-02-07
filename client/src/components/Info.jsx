@@ -50,15 +50,19 @@ export default function Info(props){
             await axios.get(`${endpoint}api/profile/${id}`, {signal})
             .then( response => {
                 //console.log(response.data.response);
-                setProfile(response.data.response);
-                console.log(`The id is: ${id}`);
-                if (id === user.user._id){
-                    setIsUser(true);
-                    // props.changeUser({...user.user, auth: user.auth, user: response.data.response});
+                if (response.status === 401){
+                    console.log('response');
                 } else {
-                    setIsUser(false);
+                    setProfile(response.data.response);
+                    console.log(`The id is: ${id}`);
+                    if (id === user.user._id){
+                        setIsUser(true);
+                        // props.changeUser({...user.user, auth: user.auth, user: response.data.response});
+                    } else {
+                        setIsUser(false);
+                    }
+                    
                 }
-                
                 })
                 .then(() => {
                     if (!isUser){
@@ -91,12 +95,14 @@ export default function Info(props){
                 })
             .catch(err => {
                 console.log(err);
+                // props.changeUser(false);
             });
         }
         getDetails()
         return () => controller.abort();
     }, [id, profile._id, user.user.firstName, user.user.lastName, user.user.email]);
 
+    
 
     /*Function to change the details of the user */
     function handleSubmit(e){

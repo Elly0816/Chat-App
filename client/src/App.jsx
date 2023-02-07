@@ -11,6 +11,7 @@ import People from './components/People';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { createContext } from 'react';
 import { Buffer } from 'buffer';
+import logoutController from './controllers/userLogoutController';
 
 
 
@@ -27,6 +28,7 @@ function App() {
   const [ socket, setSocket ] = useState();
 
   const [ user, setUser ] = useState({auth: null, user: {}});
+  
 
   //This state stores the user's profile image
   const [profileImage, setProfileImage] = useState();
@@ -34,6 +36,14 @@ function App() {
   //The sound that plays for incoming messages
   const ringtone = new Audio('sounds/new message notification.wav');
 
+  /*
+    Something needs to be done with the token gotten
+    from the request from the server
+
+
+    Check online for details on how it works
+
+  */
   
   /*This checks if a user has previously logged in */
   useEffect(() => {
@@ -44,6 +54,8 @@ function App() {
       function getUser(){
         axios.get(`${endpoint}api/user/${userInStorage._id}`)
         .then(response => {
+          console.log("Response is: ");
+          console.log(response);
           if (response.data.user){
             localStorage.setItem('user', JSON.stringify(response.data.user));
             setUser({auth: true, user: response.data.user});
@@ -51,6 +63,10 @@ function App() {
             setUser({auth: false});
           }
           
+        }).catch((err) => {
+          console.log(err);
+          logoutController(endpoint);
+          setUser({auth: false});
         });
       }
       getUser();
