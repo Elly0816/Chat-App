@@ -14,10 +14,10 @@ import logoutController from '../controllers/userLogoutController';
 export default function Header(props) {
 
     const navigate = useNavigate();
-    const {user, endpoint} = useContext(appContext);
+    const {user, setUser} = useContext(appContext);
 
     function logout(){
-        logoutController(endpoint, navigate, props.logout);  
+        logoutController(navigate, setUser);  
     }
 
     const [ openSearch, setOpenSearch ] = useState(false);

@@ -5,6 +5,7 @@ import { Button } from 'react-bootstrap';
 import lodash from 'lodash';
 import Form from 'react-bootstrap/Form';
 import { appContext } from '../App';
+import {instance} from "../config/axiosConfig";
 
 export default function People(props){
 
@@ -27,7 +28,7 @@ export default function People(props){
         const {signal} = controller;
         async function getPeople(){
             if (request !== 'pendingRequests') {
-                await axios.get(`${endpoint}api/${request}/${id}`, {signal})
+                await instance.get(`/api/${request}/${id}`, {signal})
                 .then(response => 
                 {   
                     setTitle(`${lodash.capitalize(request)}s`);
@@ -37,7 +38,7 @@ export default function People(props){
                 )
                 .catch(err => console.log(err));
             } else {
-                await axios.get(`${endpoint}api/request/${id}`, {signal})
+                await instance.get(`/api/request/${id}`, {signal})
                 .then(response => 
                 {   setTitle('Pending Requests');
                     setPeople(response.data.pending);
@@ -53,10 +54,10 @@ export default function People(props){
         
     }, [id, request, user, endpoint]);
 
-    function handleClick(id, todo){
+    async function handleClick(id, todo){
         switch (todo) {
             case "cancel sent request" :
-                axios.patch(`${endpoint}api/pending-requests/${user.user._id}`, {id: id})
+                await instance.patch(`/api/pending-requests/${user.user._id}`, {id: id})
                 .then(response => {
                 props.setUser({...user, user: response.data.user})
                 setPeople(people.filter((person) => person._id !== id));
@@ -65,7 +66,7 @@ export default function People(props){
                 .catch(err => console.log(err));
                 break
             case "decline request":
-                axios.patch(`${endpoint}request/${user.user._id}`, {id: id})
+                await instance.patch(`/request/${user.user._id}`, {id: id})
                 .then(response => {
                 props.setUser({...user, user: response.data.user})
                 setPeople(people.filter((person) => person._id !== id));
@@ -74,7 +75,7 @@ export default function People(props){
                 .catch(err => console.log(err));
                 break
             case "accept request":
-                axios.post(`${endpoint}api/connection/${user.user._id}`, {id: id})
+                await instance.post(`/api/connection/${user.user._id}`, {id: id})
                 .then(response => {
                 props.setUser({...user, user: response.data.user})
                 setPeople(people.filter((person) => person._id !== id));
@@ -83,7 +84,7 @@ export default function People(props){
                 .catch(err => console.log(err));
                 break
             case "remove connection":
-                axios.patch(`${endpoint}api/connection/${user.user._id}`, {id: id})
+                await instance.patch(`/api/connection/${user.user._id}`, {id: id})
                 .then(response => {
                     props.setUser({...user, user: response.data.user})
                     setPeople(people.filter(person => person._id !== id));
@@ -92,7 +93,7 @@ export default function People(props){
                 .catch(err => console.log(err));
                 break
             case "create chat":
-                axios.get(`${endpoint}api/chat/${user.user._id}/${id}`)
+                await instance.get(`/chat/${user.user._id}/${id}`)
                 .then(response => {
                     navigate('/');
                 })

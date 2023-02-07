@@ -1,16 +1,17 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 import { appContext } from '../App';
 import Picture from './Picture';
 import { Buffer } from 'buffer';
+import {instance } from "../config/axiosConfig";
 
 
 
 export default function Info(props){
-    const {setUser, user, endpoint, profileImage} = useContext(appContext);
+    const {setUser, user, profileImage} = useContext(appContext);
 
 
     const {id} = useParams();
@@ -47,7 +48,7 @@ export default function Info(props){
         const controller = new AbortController();
         const {signal} = controller;
         async function getDetails(){
-            await axios.get(`${endpoint}api/profile/${id}`, {signal})
+            await instance.get(`/api/profile/${id}`, {signal})
             .then( response => {
                 //console.log(response.data.response);
                 if (response.status === 401){
@@ -100,7 +101,7 @@ export default function Info(props){
         }
         getDetails()
         return () => controller.abort();
-    }, [id, profile._id, user.user.firstName, user.user.lastName, user.user.email]);
+    }, [id, profile._id, user.user._id]);
 
     
 
@@ -109,7 +110,7 @@ export default function Info(props){
         //console.log('submit clicked');
         e.preventDefault();
         async function changeDetails(){
-            await axios.patch(`${endpoint}api/profile/${id}`, {
+            await instance.patch(`/api/profile/${id}`, {
                 firstName: profile.firstName,
                 lastName: profile.lastName,
                 fullName: `${profile.firstName} ${profile.lastName}`,
@@ -117,7 +118,7 @@ export default function Info(props){
             })
             .then( response => {
                 console.log(response.data.response);
-                props.changeUser({...user, user: response.data.response});
+                setUser({...user, user: response.data.response});
             })
             .catch(err => {
                 console.log(err);
@@ -136,7 +137,7 @@ export default function Info(props){
     /*Function to send requests to another user*/
     function sendRequest(e){
         async function requestSender(){
-            await axios.post(`${endpoint}api/request/${user.user._id}`, {id: id})
+            await instance.post(`/api/request/${user.user._id}`, {id: id})
             .then( response => {
                 //console.log(response);
                 // props.changeUser({...user.user, user: response.data.user});
@@ -153,9 +154,9 @@ export default function Info(props){
 
     function acceptRequest(){
         async function accept(){
-            await axios.post(`${endpoint}api/connection/${user.user._id}`, {id: id})
+            await instance.post(`/api/connection/${user.user._id}`, {id: id})
                 .then(response => {
-                props.changeUser({...user, user: response.data.user})
+                setUser({...user, user: response.data.user})
                 setConnected(true);
                 })
                 .catch(err => console.log(err));
@@ -165,9 +166,9 @@ export default function Info(props){
 
     function removeConnection(){
         async function remove(){
-            await axios.patch(`${endpoint}api/connection/${user.user._id}`, {id: id})
+            await instance.patch(`/api/connection/${user.user._id}`, {id: id})
                 .then(response => {
-                    props.changeUser({...user, user: response.data.user})
+                    setUser({...user, user: response.data.user})
                     setConnected(false);
                     profile.connections.filter(connection => connection !== user.user._id);
                 })
@@ -178,7 +179,7 @@ export default function Info(props){
     
     //Creates or returns chat between two users
     async function createChat(){
-        await axios.get(`${endpoint}api/chat/${user.user._id}/${profile._id}`)
+        await instance.get(`/api/chat/${user.user._id}/${profile._id}`)
         .then(response => {
             //console.log(response);
             navigate("/");
@@ -200,7 +201,7 @@ export default function Info(props){
     //This uploads the image to the server
     async function uploadImage(){
         console.log(imageToUpload.values());
-        await axios.post(`${endpoint}api/profImgUpload/${user.user._id}`, imageToUpload, 
+        await instance.post(`/api/profImgUpload/${user.user._id}`, imageToUpload, 
         {headers: {'Content-Type': 'multipart/form-data'}})
         .then(res => {
             console.log(res.data.response);

@@ -12,6 +12,7 @@ import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { createContext } from 'react';
 import { Buffer } from 'buffer';
 import logoutController from './controllers/userLogoutController';
+import { instance } from './config/axiosConfig';
 
 
 
@@ -51,8 +52,8 @@ function App() {
     if (loggedInUser){
       const userInStorage = JSON.parse(loggedInUser);
       if (userInStorage){
-      function getUser(){
-        axios.get(`${endpoint}api/user/${userInStorage._id}`)
+      async function getUser(){
+        await instance.get(`/api/user/${userInStorage._id}`)
         .then(response => {
           console.log("Response is: ");
           console.log(response);
@@ -65,7 +66,7 @@ function App() {
           
         }).catch((err) => {
           console.log(err);
-          logoutController(endpoint);
+          logoutController();
           setUser({auth: false});
         });
       }
@@ -118,23 +119,24 @@ function App() {
   }
 
 
-  function authenticate(status){
-   setUser(status);
-  };
+  // function authenticate(status){
+  //  setUser(status);
+  // };
 
+  
 
   return (
     <div className='app'>
       <Router>
         <appContext.Provider value={{socket, user, endpoint, setUser, profileImage}}>
-          { user.auth && <Header logout={ authenticate }/>}
+          { user.auth && <Header/>}
           <Routes>
-            <Route path="/profile/:id" element={<Info changeUser={ authenticate } /> } />
+            <Route path="/profile/:id" element={<Info /> } />
             <Route path="/login" element={ 
-              !user.auth ? <Login authenticate={ authenticate }/> : <Navigate to="/" /> } />
+              !user.auth ? <Login/> : <Navigate to="/" /> } />
             {user.auth !== null && <Route path="/" element={ user.auth ? <Home
                                                             sendMessage={ sendMessage } /> : <Navigate to="/login" /> }/>}
-            {user.auth && <Route path="/:request/:id" element={ <People setUser={ setUser } user={ user } endpoint={ endpoint }/> } />}
+            {user.auth && <Route path="/:request/:id" element={ <People user={ user } endpoint={ endpoint }/> } />}
           </Routes>
           {/* { user.auth && <Footer/>} */}  
         </appContext.Provider>

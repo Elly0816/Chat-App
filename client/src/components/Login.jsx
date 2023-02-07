@@ -1,18 +1,19 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext} from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import axios from 'axios';
+// import axios from 'axios';
 import Footer from './Footer';
 import { useNavigate } from 'react-router-dom';
-import { appContext } from '../App';
+// import { appContext } from '../App';
 import registerController from "../controllers/userRegisterController";
 import loginController from "../controllers/userLoginController";
-
-
+import {instance} from "../config/axiosConfig";
+import { appContext } from '../App';
 
 export default function Login(props){
 
-    const {endpoint} = useContext(appContext);
+    // const {endpoint} = useContext(appContext);
+    const {setUser} = useContext(appContext);
 
     const navigate = useNavigate();
 
@@ -59,7 +60,7 @@ export default function Login(props){
         if (register){
             const { password, password2 } = form;
             if ( password === password2 ){
-                registerController(endpoint, form)
+                registerController(form)
                 .then(response => {
                     if (response.data.response === 'login'){
                         setRegister(false);
@@ -70,10 +71,9 @@ export default function Login(props){
                     } else {
                         //console.log(response.data.user);
                         /*This saves the user to the local storage for login persistence*/
-                        localStorage.setItem('user', JSON.stringify(response.data.user));
-                        axios.defaults.headers.common['authorization'] = 
-                        'Bearer'+response.data.token;
-                        props.authenticate({auth: true, user: response.data.user});
+                        localStorage.setItem('user', JSON.stringify(response.data.user)); 
+                        localStorage.setItem('token', response.data.token);
+                        setUser({auth: true, user: response.data.user});
                         navigate("/");
                     }
                 })
@@ -86,7 +86,7 @@ export default function Login(props){
             }
         } else {
             /*This handles login */
-            loginController(endpoint, form)
+            loginController(form)
             .then(response => {
                 console.log(response);
                 if (response.data.response === 'login'){
@@ -97,11 +97,10 @@ export default function Login(props){
                     //console.log(response.data.user);
                     /*This saves the user to the local storage for login persistence*/
                     localStorage.setItem('user', JSON.stringify(response.data.user));
-                    localStorage.setItem('token', JSON.stringify(response.data.token));
-                    axios.defaults.headers.common['Authorization'] =
-                    `Bearer ${response.data.token}`;
-
-                    props.authenticate({auth: true, user: response.data.user});
+                    localStorage.setItem('token', response.data.token);
+                    // setAuthHeader('Bearer '+response.data.token);
+                    console.log(instance.defaults.headers.common['Authorization']);
+                    setUser({auth: true, user: response.data.user});
                     navigate('/');
                 }
             })

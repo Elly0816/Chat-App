@@ -1,9 +1,8 @@
-import axios from 'axios';
+import { instance } from '../config/axiosConfig.js';
 
-
-export default async function loginController(endpoint, form) {
+export default async function loginController(form) {
     const { email, password } = form;
-    return await axios.post(`${endpoint}api/login`, {
+    return await instance.post(`/api/login`, {
             email: email,
             password: password
         })

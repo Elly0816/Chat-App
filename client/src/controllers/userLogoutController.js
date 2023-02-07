@@ -1,15 +1,15 @@
-import axios from 'axios';
+import { instance } from "../config/axiosConfig.js"
 
 
-export default async function logoutController(endpoint, navigate = null, propsLogout = null) {
-    await axios.post(`${endpoint}api/logout`)
+export default async function logoutController(navigate = null, propsLogout = null) {
+    await instance.post(`/api/logout`)
         .then(response => {
             if (response.data.response === 'logged out') {
-                propsLogout && propsLogout(false);
+                propsLogout && propsLogout({ auth: false });
                 localStorage.clear();
                 navigate && navigate("/login");
-                axios.defaults.headers.common['Authorization'] = null;
-            }
+                // setAuthHeader(null);
+            };
         })
         .catch(err => console.log(err));
 };

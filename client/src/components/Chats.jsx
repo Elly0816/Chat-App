@@ -8,7 +8,7 @@ import {Buffer} from 'buffer';
 
 export default function Chats(props){
 
-  const [chats, setChats] = useState();
+  const [chats, setChats] = useState(props?.items);
 
   const [toShow, setToShow] = useState();
   
