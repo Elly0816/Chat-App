@@ -4,7 +4,6 @@ import Header from './components/Header';
 import React, { useState, useEffect, } from 'react';
 import Home from './components/Home';
 import  io from 'socket.io-client';
-import axios from 'axios';
 import Login from './components/Login';
 import Info from './components/Info';
 import People from './components/People';
@@ -40,8 +39,8 @@ function App() {
     and the user is logged in, log them out
   */
 
-    if (!(localStorage.getItem('token') && localStorage.getItem('user'))) {
-      setUser({auth: false, user: {}});
+    if (!(localStorage.getItem('token') && localStorage.getItem('user')) && user.auth) {
+      setUser({auth: null, user: {}});
     };
 
   /*
