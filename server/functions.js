@@ -136,7 +136,7 @@ function authenticateToken(req, res, jwt) {
             console.log(decoded);
             return true;
         } catch (error) {
-            req.logOut((err) => {
+            req.logout((err) => {
                 if (err) {
                     console.log(err);
                 }

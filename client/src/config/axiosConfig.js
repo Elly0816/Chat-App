@@ -21,3 +21,14 @@ instance.interceptors.request.use(async(config) => {
     });
     return config;
 });
+
+instance.interceptors.response.use(async(response) => {
+    console.log("This is the response in axiosConfig");
+    console.log(response);
+    if (response.status === 401) {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        instance.post("/logout");
+    }
+    return response;
+});

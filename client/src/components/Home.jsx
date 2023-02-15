@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import Entry from './Entry';
 import axios from 'axios';
 import Messages from './Messages';
@@ -102,17 +102,18 @@ export default function Home(props){
     
 
     //Delete message
-    function deleteMessage(id){
+    const deleteMessageCallback = useCallback((id) => {        
         if(socket){
             socket.emit('delete', {id: id,
                  otherUser: otherUserId,
                 chatId: currentChatId});
         }
-    }
+    }, [otherUserId, currentChatId, socket])
+
     
 
     //This initally loads up the messages chat from the database
-    async function getMessages(id, otherUserName, otherUserId) {
+    const getMessagesCallback = useCallback(async (id, otherUserName, otherUserId) => {
         if (id !== currentChatId){
             await instance.get(`/api/messages/${id}`)
             .then(response => {
@@ -129,7 +130,8 @@ export default function Home(props){
             })
             .catch(err => console.log(err));
         }
-    }
+    }, [currentChatId, user.user._id, socket]);
+
 
     //This sets the id of the chat to load messages from in the Entry component
     // function setChatId(id){
@@ -140,7 +142,7 @@ export default function Home(props){
                 <Chats setUserName={setOtherUserName}
                         setOtherUserId={setOtherUserId}
                         setChatId={setCurrentChatId}
-                        getMessages={getMessages}
+                        getMessages={getMessagesCallback}
                         items={items}
                         />
                 {!messages ? <div className='message-container-container'>
@@ -150,7 +152,7 @@ export default function Home(props){
                     <div className='message-name'><h6 style={{width: 'fit-content'}}><a href={`#/profile/${otherUserId}`} style={{
                     textDecoration: 'None',
                     color: '#984e3'}}>{otherUserName}</a></h6></div>
-                    <Messages chatId={currentChatId} deleteMessage={deleteMessage} userId={user.user._id} messages={messages}/>
+                    <Messages chatId={currentChatId} deleteMessage={deleteMessageCallback} userId={user.user._id} messages={messages}/>
                     <Entry otherUserId={otherUserId} chatId={currentChatId} sendMessage={ props.sendMessage } userId={user.user._id}/>
                 </div>}            
     </div>

@@ -27,6 +27,7 @@ export default function Chats(props){
          )
       setChats(chatsToShow);
       setToShow(chatsToShow);
+      console.log("The use-effect dependent on props items just ran");
    }
   }, [props.items]);
 

@@ -1,7 +1,7 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/Header';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, } from 'react';
 import Home from './components/Home';
 import  io from 'socket.io-client';
 import axios from 'axios';
@@ -16,15 +16,13 @@ import { instance } from './config/axiosConfig';
 
 
 
+const development = 'http://localhost:5000/';
+const production = 'https://full-chat-app.herokuapp.com/';
+const endpoint = process.env.NODE_ENV === 'production' ? production : development;
+
 function App() {
 
   let sendMessage;
-
-  const development = 'http://localhost:5000/';
-  const production = 'https://full-chat-app.herokuapp.com/';
-
-  const endpoint = process.env.NODE_ENV === 'production' ? production : development;
-
 
   const [ socket, setSocket ] = useState();
 
@@ -36,6 +34,15 @@ function App() {
 
   //The sound that plays for incoming messages
   const ringtone = new Audio('sounds/new message notification.wav');
+
+  /*
+    Check the local storage for token and user, if they are not there
+    and the user is logged in, log them out
+  */
+
+    if (!(localStorage.getItem('token') && localStorage.getItem('user'))) {
+      setUser({auth: false, user: {}});
+    };
 
   /*
     Something needs to be done with the token gotten
@@ -91,7 +98,7 @@ function App() {
     } else {
       setProfileImage('def-prof-pic.jpg');
     }
-  }, [user]);
+  }, [user, socket]);
 
 
 
@@ -104,7 +111,7 @@ function App() {
       const add = {userId: user.user._id}
       socket.emit('add', add);
     }
-  }, [socket])
+  }, [socket, user.user])
 
   /*Handles the sending of messages through the socket */
   if (socket){

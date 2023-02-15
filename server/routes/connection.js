@@ -1,33 +1,36 @@
 const router = require("express").Router()
 const { User } = require("../schemas.js");
-const jwt = require('jsonwebtoken');
+const { authenticateToken } = require("../functions");
+const jwt = require("jsonwebtoken");
 
 
 
 
 router.get('/:id', (req, res) => {
-    const id = req.params.id;
-    User.findById(id, ['connections'], (err, user) => {
-        if (err) {
-            console.log(err);
-        } else if (!user) {
-            console.log("Your account was not found");
-        } else {
-            console.log("Your account was found");
-            const connections = user.connections.map(connection => connection.toString());
-            //Find the users that have id's in the current users' connections
-            User.find({ '_id': { $in: connections } }, ['_id', 'img', 'firstName', 'lastName', 'fullName'],
-                (err, users) => {
-                    if (err) {
-                        console.log(err);
-                    } else if (!users) {
-                        console.log('There are no users found')
-                    } else {
-                        res.send({ users: users });
-                    }
-                });
-        }
-    });
+    if (authenticateToken(req, res, jwt)) {
+        const id = req.params.id;
+        User.findById(id, ['connections'], (err, user) => {
+            if (err) {
+                console.log(err);
+            } else if (!user) {
+                console.log("Your account was not found");
+            } else {
+                console.log("Your account was found");
+                const connections = user.connections.map(connection => connection.toString());
+                //Find the users that have id's in the current users' connections
+                User.find({ '_id': { $in: connections } }, ['_id', 'img', 'firstName', 'lastName', 'fullName'],
+                    (err, users) => {
+                        if (err) {
+                            console.log(err);
+                        } else if (!users) {
+                            console.log('There are no users found')
+                        } else {
+                            res.send({ users: users });
+                        }
+                    });
+            }
+        });
+    }
 });
 
 
