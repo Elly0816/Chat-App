@@ -374,3 +374,9 @@ a {
     max-width: 35px;
     border-radius: 50%;
 }
+
+.icon :is(img) {
+    max-width: 2em;
+    aspect-ratio: 1;
+    border-radius: 50%;
+}

@@ -13,7 +13,7 @@ import { appContext } from '../App';
 export default function Login(props){
 
     // const {endpoint} = useContext(appContext);
-    const {setUser} = useContext(appContext);
+    const {setUser, setToken} = useContext(appContext);
 
     const navigate = useNavigate();
 
@@ -73,6 +73,7 @@ export default function Login(props){
                         /*This saves the user to the local storage for login persistence*/
                         localStorage.setItem('user', JSON.stringify(response.data.user)); 
                         localStorage.setItem('token', response.data.token);
+                        setToken(response.data.token);
                         setUser({auth: true, user: response.data.user});
                         navigate("/");
                     }
@@ -98,6 +99,7 @@ export default function Login(props){
                     /*This saves the user to the local storage for login persistence*/
                     localStorage.setItem('user', JSON.stringify(response.data.user));
                     localStorage.setItem('token', response.data.token);
+                    setToken(response.data.token);
                     // setAuthHeader('Bearer '+response.data.token);
                     console.log(instance.defaults.headers.common['Authorization']);
                     setUser({auth: true, user: response.data.user});

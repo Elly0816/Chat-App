@@ -12,6 +12,7 @@ import { createContext } from 'react';
 import { Buffer } from 'buffer';
 import logoutController from './controllers/userLogoutController';
 import { instance } from './config/axiosConfig';
+import RouterHouse from './components/routerHouse';
 
 
 
@@ -22,10 +23,13 @@ const endpoint = process.env.NODE_ENV === 'production' ? production : developmen
 function App() {
 
   let sendMessage;
+  
 
   const [ socket, setSocket ] = useState();
 
   const [ user, setUser ] = useState({auth: null, user: {}});
+
+  const [token, setToken] = useState(localStorage.getItem('token'));
   
 
   //This state stores the user's profile image
@@ -38,10 +42,11 @@ function App() {
     Check the local storage for token and user, if they are not there
     and the user is logged in, log them out
   */
-
-    if (!(localStorage.getItem('token') && localStorage.getItem('user')) && user.auth) {
-      setUser({auth: null, user: {}});
-    };
+  // useEffect(()=> {
+  //   if (!(localStorage.getItem('token') && localStorage.getItem('user')) && user.auth) {
+  //     setUser({auth: null, user: {}});
+  //   };
+  // }, [location]);
 
   /*
     Something needs to be done with the token gotten
@@ -134,18 +139,20 @@ function App() {
   return (
     <div className='app'>
       <Router>
-        <appContext.Provider value={{socket, user, endpoint, setUser, profileImage}}>
-          { user.auth && <Header/>}
+      <appContext.Provider value={{socket, user, endpoint, setUser, profileImage, setToken, setSocket}}>
+          
+        <RouterHouse header={(user.auth && token) && <Header/>} page={
           <Routes>
-            <Route path="/profile/:id" element={<Info /> } />
+            <Route path="/profile/:id" element={token ? <Info /> : <Navigate to="/login"/> } />
             <Route path="/login" element={ 
               !user.auth ? <Login/> : <Navigate to="/" /> } />
             {user.auth !== null && <Route path="/" element={ user.auth ? <Home
                                                             sendMessage={ sendMessage } /> : <Navigate to="/login" /> }/>}
             {user.auth && <Route path="/:request/:id" element={ <People user={ user } endpoint={ endpoint }/> } />}
           </Routes>
+        }/>
           {/* { user.auth && <Footer/>} */}  
-        </appContext.Provider>
+      </appContext.Provider>
       </Router>
     </div>
   );

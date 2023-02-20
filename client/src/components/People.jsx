@@ -6,6 +6,9 @@ import lodash from 'lodash';
 import Form from 'react-bootstrap/Form';
 import { appContext } from '../App';
 import {instance} from "../config/axiosConfig";
+import { Buffer } from 'buffer';
+import Picture from './Picture';
+
 
 export default function People(props){
 
@@ -135,6 +138,11 @@ export default function People(props){
         </Form>
         <hr/>
         { toShow && toShow.map(person => <div style={{display:'grid', margin: '10px', gridAutoColumns: '3fr', gridAutoFlow: 'column'}} key={person._id} className='person'>
+        <Picture 
+        divClassName="icon"
+        src={person?.img && `data:${person.img.contentType};base64,${Buffer.from(person.img.data.data).toString('base64')}`}
+        handleClick={() => {navigate(`/profile/${person._id}`)}}
+        />
         <a style={{textDecoration:'none', color:'black'}} href={`/#/profile/${person._id}`}><h5>{ person.fullName}</h5></a>
         {title==='Pending Requests' && <Button
          onClick={() => handleClick(person._id, 'cancel sent request')} 

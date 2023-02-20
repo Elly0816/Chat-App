@@ -25,10 +25,10 @@ instance.interceptors.request.use(async(config) => {
 instance.interceptors.response.use(async(response) => {
     console.log("This is the response in axiosConfig");
     console.log(response);
-    if (response.status === 401) {
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-        instance.post("/logout");
-    }
     return response;
+}, async(err) => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    instance.post("/api/logout");
+    return err;
 });

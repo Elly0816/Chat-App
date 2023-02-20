@@ -51,18 +51,13 @@ export default function Info(props){
             await instance.get(`/api/profile/${id}`, {signal})
             .then( response => {
                 //console.log(response.data.response);
-                if (response.status === 401){
-                    console.log('response');
+                setProfile(response.data.response);
+                console.log(`The id is: ${id}`);
+                if (id === user.user._id){
+                    setIsUser(true);
+                    // props.changeUser({...user.user, auth: user.auth, user: response.data.response});
                 } else {
-                    setProfile(response.data.response);
-                    console.log(`The id is: ${id}`);
-                    if (id === user.user._id){
-                        setIsUser(true);
-                        // props.changeUser({...user.user, auth: user.auth, user: response.data.response});
-                    } else {
-                        setIsUser(false);
-                    }
-                    
+                    setIsUser(false);
                 }
                 })
                 .then(() => {
